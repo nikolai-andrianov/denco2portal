@@ -68,53 +68,26 @@
 	<script src="https://cdn.metroui.org.ua/current/metro.js"></script>
 
 	<div class="header">
-		<!--  <h1 class="text-center">Header</h1>	-->
-		
+
 		<ul class="h-menu">
-			<li><a href="#">Home</a></li>
-			<li><a href="#">Products</a></li>
-			<li><a href="#">Support</a></li>
-			<li><a href="#">Cart</a></li>
+			<li>
+				<a href="#" class="dropdown-toggle">Project</a>
+				<ul class="d-menu" data-role="dropdown">
+					<li><a href="project.html">Open</a></li>
+					<li class="divider"></li>
+					<li><a href="#">Close</a></li>
+				</ul>
+			</li>
+			<li><a href="blog.html">Blog</a></li>
+			<li><a href="about.html">About</a></li>
 		</ul>
+
 				
 	</div>
 	<div id="map" class="center"></div>
 	<div class="footer">Footer</div>
 	
-	<!-- A list of Stenlille wells with their coordinates -->
-	<script src="./stenlille/stenlille_wells.js"></script>
-	
-	<!-- dates_snapshots.js contains the list of dates and solution snapshots -->
-	<script src="./stenlille/dates_snapshots.js"></script>
-	
-	<script>
 
-		// Set view around Stenlille
-		const map = L.map('map').setView([55.546504, 11.600876], 13);
-
-		const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			maxZoom: 19,
-			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-			}).addTo(map);
-			
-		// Plot the wells
-		let well_marker = []
-		for (var i=0;i<wells.length;i++) {
-			well_marker[i] = L.marker([wells[i].N_Degrees, wells[i].E_Degrees], { title: wells[i].Name }).addTo(map);		
-		}
-			
-
-			
-		//var marker = L.marker([55.546504, 11.600876], { title: "HEHE" }).addTo(map);
-		//	.bindPopup('<b>ST-1</b><br />Spud date: 1980/06/06<br />Completion date: 1980/07/08').openPopup();
-		
-		 //var mydata = JSON.parse(dates_snapshots);
-		 //alert(dates_snapshots[0].date);
-		 //alert(mydata[0].date);
-		 //alert(mydata[0].snapshot);
-
-	
-	</script>
 
 
 </body>
