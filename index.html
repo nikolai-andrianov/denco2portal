@@ -6,14 +6,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	
 	<title>Test</title>
+	
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+	<!-- 
+	<script type="text/javascript" src="dates_snapshots.json"></script>
+	-->
+	
+	<!--  
+	<script type="text/javascript" src="data.json"></script>
+	-->
+	
+	<!-- 
+	<script type="text/javascript" src="test.json"></script>
+	-->
+	
+	<!-- 
+	<script type="text/javascript" src="javascript.js"></script>
+	-->
+	 
+	<style>
+
+		/* Change the html body to be a grid with 2 columns and 3 rows */
+		body {
+		  margin: 0;
+		  height: 100vh;
+		  display: grid;
+		  grid-template-columns: 200px 1fr;
+		  grid-template-rows   : 50px 1fr 100px;
+		  grid-template-areas: 
+			"lg hd" 
+			"lt cn" 
+			"ft ft";
+		  gap: 3px;
+		}
+
+		/* Set the min size for the html div */
+		/*
+		div { 
+		  min-height: 20vh;
+		  min-width: 20vw;
+		}
+		*/
+
+		.logo {
+		  grid-area: lg;
+		}
+
+		.header {
+		  grid-area: hd;
+		}
+
+		.left {
+		  grid-area: lt;
+		}
+
+		.center {
+		  grid-area: cn;
+		}
+
+		.footer {
+		  grid-area: ft;
+		}
+
+	</style>
+	
 </head>
 
 <body>
 
-<h1>Hello denco2portal!</h1>
+	<div class="header">Header</div>
+	<div class="left">Left</div>
+	<div id="map" class="center"></div>
+	<div class="footer">Footer</div>
+	
+	<!-- A list of Stenlille wells with their coordinates -->
+	<script src="./stenlille/stenlille_wells.js"></script>
+	
+	<!-- dates_snapshots.js contains the list of dates and solution snapshots -->
+	<script src="./stenlille/dates_snapshots.js"></script>
+	
+	<script>
 
-updated..
+		// Set view around Stenlille
+		const map = L.map('map').setView([55.546504, 11.600876], 13);
+
+		const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+			}).addTo(map);
+			
+		// Plot the wells
+		let well_marker = []
+		for (var i=0;i<wells.length;i++) {
+			well_marker[i] = L.marker([wells[i].N_Degrees, wells[i].E_Degrees], { title: wells[i].Name }).addTo(map);		
+		}
+			
+
+			
+		//var marker = L.marker([55.546504, 11.600876], { title: "HEHE" }).addTo(map);
+		//	.bindPopup('<b>ST-1</b><br />Spud date: 1980/06/06<br />Completion date: 1980/07/08').openPopup();
+		
+		 //var mydata = JSON.parse(dates_snapshots);
+		 //alert(dates_snapshots[0].date);
+		 //alert(mydata[0].date);
+		 //alert(mydata[0].snapshot);
+
+	
+	</script>
+
 
 </body>
 </html>
