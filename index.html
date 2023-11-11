@@ -28,38 +28,22 @@
 	 
 	<style>
 
-		/* Change the html body to be a grid with 2 columns and 3 rows */
+		/* Change the html body to be a grid with 3 rows */
 		body {
 		  margin: 0;
 		  height: 100vh;
 		  display: grid;
-		  grid-template-columns: 200px 1fr;
+		  grid-template-columns: 1fr;
 		  grid-template-rows   : 50px 1fr 100px;
 		  grid-template-areas: 
-			"lg hd" 
-			"lt cn" 
-			"ft ft";
+			"hd" 
+			"cn" 
+			"ft";
 		  gap: 3px;
-		}
-
-		/* Set the min size for the html div */
-		/*
-		div { 
-		  min-height: 20vh;
-		  min-width: 20vw;
-		}
-		*/
-
-		.logo {
-		  grid-area: lg;
 		}
 
 		.header {
 		  grid-area: hd;
-		}
-
-		.left {
-		  grid-area: lt;
 		}
 
 		.center {
@@ -77,7 +61,6 @@
 <body>
 
 	<div class="header">Header</div>
-	<div class="left">Left</div>
 	<div id="map" class="center"></div>
 	<div class="footer">Footer</div>
 	
