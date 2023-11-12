@@ -75,7 +75,7 @@
 				<ul class="d-menu" data-role="dropdown">
 					<li><a href="project.html">Open</a></li>
 					<li class="divider"></li>
-					<li><a href="#">Close</a></li>
+					<li><a href="blog.html">Close</a></li>
 				</ul>
 			</li>
 			<li><a href="blog.html">Blog</a></li>
@@ -106,7 +106,8 @@
 		// Plot the wells
 		let well_marker = []
 		for (var i=0;i<wells.length;i++) {
-			well_marker[i] = L.marker([wells[i].N_Degrees, wells[i].E_Degrees], { title: wells[i].Name }).addTo(map);		
+			well_marker[i] = L.marker([wells[i].N_Degrees, wells[i].E_Degrees], { title: wells[i].Name }).addTo(map)
+							.bindPopup(''.concat('<b>', wells[i].Name, '</b><br />')).openPopup();			
 		}
 			
 
