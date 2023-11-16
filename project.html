@@ -11,22 +11,26 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-	<!-- Add Metro UI 		-->
+	<!-- Add Metro UI	--> 		
     <link rel="stylesheet" href="https://cdn.metroui.org.ua/current/metro.css">
+	
+	<!-- Include jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
  
 	<style>
 
-		/* Change the html body to be a grid with 3 rows */
+		/* Change the html body to be a grid with 4 rows */
 		body {
 		  margin: 0;
 		  height: 100vh;
 		  display: grid;
 		  grid-template-columns: 1fr;
-		  grid-template-rows   : 75px 1fr 75px;
+		  grid-template-rows   : 75px 0.75fr 0.25fr 75px;
 		  grid-template-areas: 
 			"hd" 
 			"cn" 
+			"ct"
 			"ft";
 		  gap: 3px;
 		}
@@ -37,6 +41,10 @@
 
 		.center {
 		  grid-area: cn;
+		}
+		
+		.control {
+		  grid-area: ct;
 		}
 
 		/* line-height: 75px; matches the height of the 3rd row for vertically aligned text */
@@ -52,8 +60,9 @@
 
 <body>
 
-	<!-- Add Metro UI -->
+	<!-- Add Metro UI 	-->
 	<script src="https://cdn.metroui.org.ua/current/metro.js"></script>
+
 
 	<div class="header">
 		<ul class="h-menu">
@@ -70,25 +79,63 @@
 		</ul>				
 	</div>
 	
+	
+	<!-- A list of Stenlille wells with their coordinates -->
+	<script src="./stenlille/stenlille_wells.js"></script>
+		
+	<!-- dates_snapshots.js contains the list of dates and solution snapshots -->
+	<script src="./stenlille/dates_snapshots.js"></script>
+		
+	<!-- First define the time menu for snapshots so it will be available below -->
+	
+	<div id="ctrl" class="control">
+	<div class="container">	
+	
+		<!--  Menu with available time instants -->
+		<select id="menu-time">
+		</select>
+	
+		<script>		
+			for (var i=0; i<dates_snapshots.length; i++) {
+				var option = document.createElement("option");
+				option.value = i;
+				
+				// FF does not support innerText, have to handle that separately
+				if (typeof option.innerText === "undefined")
+				{
+					option.textContent = dates_snapshots[i].date;
+				}
+				else
+				{
+					option.innerText = dates_snapshots[i].date;
+				}
+
+				var select = document.getElementById("menu-time");
+				select.appendChild(option);
+			}		
+		</script>		
+
+	</div>
+	</div>	
+	
+	<!-- The central visualization area -->
 	<div id="map" class="center">
 	<div class="container">	
-
-		<!-- A list of Stenlille wells with their coordinates -->
-		<script src="./stenlille/stenlille_wells.js"></script>
-		
-		<!-- dates_snapshots.js contains the list of dates and solution snapshots -->
-		<script src="./stenlille/dates_snapshots.js"></script>
-		
-				Select time instant:
-		<select id="mapset">
-			<option value="0" selected>0</option>
-			<option value="1">1</option>
-		</select>
 		
 		<script>
 
 			// Set view around Stenlille
-			const map = L.map('map').setView([55.546504, 11.600876], 13);
+			var map = L.map('map').setView([55.546504, 11.600876], 13);
+			
+			var selectedSnapshot = 0;
+			var snapshotLayer; 
+			
+			// The lateral extent of the solution snapshot
+			//var latLngBounds = L.latLngBounds([[55.5, 11.6], [55.6, 11.8]]);
+			// (55.49807691217072, 11.572807538586625, 55.57592748575638, 11.642046488309468)
+			dx = 0.001
+			dy = 0.001
+			var latLngBounds = L.latLngBounds([[dx+55.49807691217072, dy+11.572807538586625], [dx+55.58, dy+11.642046488309468]]);
 
 			const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 19,
@@ -102,26 +149,43 @@
 			let well_marker = []
 			for (var i=0;i<wells.length;i++) {
 				well_marker[i] = L.marker([wells[i].N_Degrees, wells[i].E_Degrees], { title: wells[i].Name }).addTo(map)
-								.bindPopup(''.concat('<b>', wells[i].Name, '</b><br />')).openPopup();			
+								.bindPopup(''.concat('<b>', wells[i].Name, '</b>')).openPopup();			
 			}
-				
-
-				
-			//var marker = L.marker([55.546504, 11.600876], { title: "HEHE" }).addTo(map);
-			//	.bindPopup('<b>ST-1</b><br />Spud date: 1980/06/06<br />Completion date: 1980/07/08').openPopup();
 			
-			 //var mydata = JSON.parse(dates_snapshots);
-			 //alert(dates_snapshots[0].date);
-			 //alert(mydata[0].date);
-			 //alert(mydata[0].snapshot);
+			drawMap();
+			
+			
+			// If another item is chosen on the menu-time
+			$("#menu-time").change(function() {
+				
+			    // Remove the current solution snapshot
+			    map.removeLayer(snapshotLayer);
 
-		
-		</script>
-		
+				// Assign the index of the selected snapshot
+				selectedSnapshot = $(this).val();
 
-	
+				// Redraw the map 
+				drawMap();
+			});
+
+			function drawMap() {
+			
+				let fname = dates_snapshots[selectedSnapshot].snapshot;
+				let image = "./stenlille/".concat(fname);
+
+				snapshotLayer = L.imageOverlay(image, latLngBounds, {
+					opacity: 0.7,
+					interactive: true
+				});
+				
+				// Draw the snapshot, corresponding to selectedSnapshot
+				map.addLayer(snapshotLayer);
+			}
+		
+		</script>	
 	</div>
 	</div>
+
 	
 	<div class="footer">&copy; CO<sub>2</sub> Portal 2023</div>
 	
