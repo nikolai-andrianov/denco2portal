@@ -5,30 +5,20 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	
-	<title>Test</title>
+	<title>Denmark's CO2 Portal - Home</title>
 	
 	<!-- Add Leaflet classes -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-	<!-- Add Metro UI -->
+	<!-- Add Metro UI 		 -->
     <link rel="stylesheet" href="https://cdn.metroui.org.ua/current/metro.css">
 	
-	<!-- 
-	<script type="text/javascript" src="dates_snapshots.json"></script>
-	-->
+
+
 	
-	<!--  
-	<script type="text/javascript" src="data.json"></script>
-	-->
-	
-	<!-- 
-	<script type="text/javascript" src="test.json"></script>
-	-->
-	
-	<!-- 
-	<script type="text/javascript" src="javascript.js"></script>
-	-->
+	<!-- Add Metro icons -->
+	<link href="https://metroui.org.ua/v2/css/iconFont.css" rel="stylesheet">
 	 
 	<style>
 
@@ -69,11 +59,54 @@
 
 	<!-- Add Metro UI -->
 	<script src="https://cdn.metroui.org.ua/current/metro.js"></script>
+	
+	<!-- Coordinates of the structures 	-->	
+	<script src="./structures/stenlille_structure.js"></script>
+	<script src="./structures/havnsoe_structure.js"></script>
+	<script src="./structures/gassum_structure.js"></script>
+	<script src="./structures/thorning_structure.js"></script>
+	<script src="./structures/roedby_structure.js"></script>	
+	<script src="./structures/lisa_structure.js"></script>
+	<script src="./structures/inez_structure.js"></script>						
+	<script src="./structures/jammerbugt_structure.js"></script>		
 
 	<!-- Header -->
 	<script src="./header.js"></script>	
 	
-	<div id="map" class="center"></div>
+	<!-- The central visualization area -->
+	<div id="map" class="center">
+	<div class="container">	
+	</div>
+	</div>
+	
+	<script>
+	
+		// Set view to see all structures
+		const map = L.map('map').setView([55.909194, 10.255737], 7);		
+		const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+			}).addTo(map);
+			
+		// Add scale
+		L.control.scale({imperial: false}).addTo(map); 
+		
+		// Plot the structures' contours
+		const stenlille_contour = L.polygon(stenlille).addTo(map)
+		const havnsoe_contour = L.polygon(havnsoe).addTo(map).bindPopup('Havnsø');
+		const gassum_contour = L.polygon(gassum).addTo(map).bindPopup('Gassum');
+		const thorning_contour = L.polygon(thorning).addTo(map).bindPopup('Thorning');
+		const roedby_contour = L.polygon(roedby).addTo(map).bindPopup('Rødby');
+		const lisa_contour = L.polygon(lisa).addTo(map).bindPopup('Lisa');
+		const _contour = L.polygon(inez).addTo(map).bindPopup('Inez');
+		const inez_contour = L.polygon(jammerbugt).addTo(map).bindPopup('Jammerbugt');		
+
+		// For Stenlille, open the project
+		stenlille_contour.on('click', function(evt) { 
+			window.open("./project.html")
+		});
+	</script>	
+
 	
 	<!-- Footer -->
 	<script src="./footer.js"></script>
