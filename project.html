@@ -75,6 +75,9 @@
 	<!-- dates_snapshots.js contains the list of dates and solution snapshots -->
 	<script src="./stenlille/dates_snapshots.js"></script>
 		
+	<!-- Utilitary functions -->
+	<script src="./utils.js"></script>
+	
 	<!-- First define the time menu for snapshots so it will be available below -->
 	
 	<div id="ctrl" class="control">
@@ -118,14 +121,8 @@
 			
 			var selectedSnapshot = 0;
 			var snapshotLayer; 
+			var latLngBounds;
 			
-			// The lateral extent of the solution snapshot
-			//var latLngBounds = L.latLngBounds([[55.5, 11.6], [55.6, 11.8]]);
-			// (55.49807691217072, 11.572807538586625, 55.57592748575638, 11.642046488309468)
-			dx = 0.001
-			dy = 0.001
-			var latLngBounds = L.latLngBounds([[dx+55.49807691217072, dy+11.572807538586625], [dx+55.58, dy+11.642046488309468]]);
-
 			const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 19,
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -133,6 +130,15 @@
 				
 			// Add scale
 			L.control.scale({imperial: false}).addTo(map); 
+			
+			/*
+			function onMapClick(e) {
+				L.popup(e.latlng)
+					.setContent(`You clicked the map at ${e.latlng.toString()}`)
+					.openOn(map);
+			}
+			map.on('click', onMapClick);
+			*/
 				
 			// Plot the wells
 			let well_marker = []
@@ -141,8 +147,42 @@
 								.bindPopup(''.concat('<b>', wells[i].Name, '</b>')).openPopup();			
 			}
 			
-			drawMap();
 			
+			let img = new Image();
+			img.onload = function() {
+				img.width = this.width;
+			    img.height = this.height;
+						
+				// This ratio is obtained by getting the pixel distance between ST-1 and ST-9 in GIMP,
+				// and the distance in km between these wells in plot_stenlille.py
+				img.px2km = 0.91 / 58;
+						
+				let imgWidthKm = img.width * img.px2km;
+				let imgHeightKm = img.height * img.px2km;
+
+				// Manually adjusted
+				let nw = [55.569329, 11.537189];
+				
+				// Coordinates for the NE corner of the image
+				//var A = L.marker(nw).addTo(map).bindPopup('<b>NW</b>').openPopup();
+				let ne = destination(nw, 90, imgWidthKm * 1000);
+				// L.marker(L.latLng(ne)).addTo(map);
+				
+				// Coordinates for the SE corner of the image
+				let se = destination(ne, 180, imgHeightKm * 1000);
+				// L.marker(L.latLng(se)).addTo(map);			
+
+				// Set up the NW-SE bounding box
+				latLngBounds = L.latLngBounds([nw, se]);
+				
+				//console.log(latLngBounds);				
+				drawMap();
+
+			}
+			
+			let fname = dates_snapshots[selectedSnapshot].snapshot;
+			let image = "./stenlille/".concat(fname);	
+			img.src = image;	
 			
 			// If another item is chosen on the menu-time
 			$("#menu-time").change(function() {
@@ -152,6 +192,8 @@
 
 				// Assign the index of the selected snapshot
 				selectedSnapshot = $(this).val();
+				
+				console.log(selectedSnapshot);
 
 				// Redraw the map 
 				drawMap();
@@ -160,7 +202,7 @@
 			function drawMap() {
 			
 				let fname = dates_snapshots[selectedSnapshot].snapshot;
-				let image = "./stenlille/".concat(fname);
+				let image = "./stenlille/".concat(fname);				
 
 				snapshotLayer = L.imageOverlay(image, latLngBounds, {
 					opacity: 0.7,
@@ -169,6 +211,12 @@
 				
 				// Draw the snapshot, corresponding to selectedSnapshot
 				map.addLayer(snapshotLayer);
+				
+				/*
+				// Make the snapshot draggable
+				var draggable = new L.Draggable(snapshotLayer.getElement());
+				draggable.enable();	
+				*/
 			}
 		
 		</script>	
