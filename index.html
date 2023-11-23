@@ -50,6 +50,12 @@
 		  line-height: 75px;
 		  text-align: center;
 		}
+		
+		/*
+		.leaflet-control-attribution {
+		  z-index: 1000;
+		}
+		*/
 
 	</style>
 	
@@ -89,7 +95,8 @@
 			}).addTo(map);
 			
 		// Add scale
-		L.control.scale({imperial: false}).addTo(map); 
+		// The default topleft position is not displayed properly due to conflicts with the Metro CSS
+		L.control.scale({imperial: false, position: 'topright'}).addTo(map); 
 		
 		// Plot the structures' contours
 		const stenlille_contour = L.polygon(stenlille).addTo(map)

@@ -16,6 +16,7 @@
 	
 	<!-- Add Metro icons -->
 	<link href="https://metroui.org.ua/v2/css/iconFont.css" rel="stylesheet">
+	<link href="./icons/metro-icons.css" rel="stylesheet">
 	
 	<!-- Include jQuery -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -29,11 +30,11 @@
 		  height: 100vh;
 		  display: grid;
 		  grid-template-columns: 1fr;
-		  grid-template-rows   : 75px 0.75fr 0.25fr 75px;
+		  grid-template-rows   : 75px 75px 1fr 75px;
 		  grid-template-areas: 
 			"hd" 
-			"cn" 
 			"ct"
+			"cn" 
 			"ft";
 		  gap: 3px;
 		}
@@ -41,15 +42,15 @@
 		.header {
 		  grid-area: hd;
 		}
-
-		.center {
-		  grid-area: cn;
-		}
 		
 		.control {
 		  grid-area: ct;
 		}
-
+		
+		.center {
+		  grid-area: cn;
+		}
+		
 		/* line-height: 75px; matches the height of the 3rd row for vertically aligned text */
 		.footer {
 		  grid-area: ft;
@@ -83,10 +84,18 @@
 	<div id="ctrl" class="control">
 	<div class="container">	
 	
+		<!-- 
+		<span class="mif-backward"></span>
+		<span class="mif-pause"></span>
+		<span class="mif-play"></span>
+		<span class="mif-forward"></span>
+		-->
+	
+		
 		<!--  Menu with available time instants -->
 		<select id="menu-time">
 		</select>
-	
+		
 		<script>		
 			for (var i=0; i<dates_snapshots.length; i++) {
 				var option = document.createElement("option");
@@ -129,8 +138,9 @@
 				}).addTo(map);
 				
 			// Add scale
-			L.control.scale({imperial: false}).addTo(map); 
-			
+			// The default topleft position is not displayed properly due to conflicts with the Metro CSS
+			L.control.scale({imperial: false, position: 'topright'}).addTo(map); 
+				
 			/*
 			function onMapClick(e) {
 				L.popup(e.latlng)
