@@ -267,7 +267,7 @@
 					$("#time-play-pause").toggleClass("mif-play", false);
 					$("#time-play-pause").toggleClass("mif-pause", true);
 					
-					async function load () { 				
+					async function load() { 				
 						let current = selectedSnapshot;
 						for (selectedSnapshot=current; selectedSnapshot<dates_snapshots.length; selectedSnapshot++) {
 
@@ -321,6 +321,16 @@
 				var draggable = new L.Draggable(snapshotLayer.getElement());
 				draggable.enable();	
 				*/
+				
+				async function waitSnapshotLoaded() { 				
+					while (!map.hasLayer(snapshotLayer)) {						
+						// Pause for 100 milliseconds
+						await timer(100); 					
+					}
+				}	
+				
+				waitSnapshotLoaded();	
+				
 			}
 		
 		</script>	
