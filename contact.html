@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	
+	<title>Denmark's CO2 Portal - Disclaimer</title>
+	
+	<!-- Add Leaflet classes -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+	<!-- Add Metro UI -->
+    <link rel="stylesheet" href="https://cdn.metroui.org.ua/current/metro.css">
+	
+	<!-- Add Metro icons -->
+	<link href="https://metroui.org.ua/v2/css/iconFont.css" rel="stylesheet">
+		 
+	<style>
+
+		/* Change the html body to be a grid with 3 rows */
+		body {
+		  margin: 0;
+		  height: 100vh;
+		  display: grid;
+		  grid-template-columns: 1fr;
+		  grid-template-rows   : 75px 1fr 75px;
+		  grid-template-areas: 
+			"hd" 
+			"cn" 
+			"ft";
+		  gap: 3px;
+		}
+
+		.header {
+		  grid-area: hd;
+		}
+
+		.center {
+		  grid-area: cn;
+		}
+		
+		/* padding top, left/right, bottom */
+		.center_text {
+		  grid-area: cn;
+		  padding:10px 10px 10px;
+		}
+
+		/* line-height: 75px; matches the height of the 3rd row for vertically aligned text */
+		.footer {
+		  grid-area: ft;
+		  line-height: 75px;
+		  text-align: center;
+		}
+		
+		.author-photo {
+          position: relative;
+		  top: 20px;
+		  left: 20px;
+		  width: 75px;
+		  height: 75px;
+		  border-radius: 50%;
+		}
+		
+		.author-text-block {
+		  position: absolute;
+		  top: 40px;
+		  left: 95px;
+		  padding-left: 20px;
+		  padding-right: 20px;
+		  font-weight:    bold;
+		}		
+		
+		.post-date-block {
+		  position: absolute;
+		  top: 60px;
+		  left: 95px;
+		  padding-left: 20px;
+		  padding-right: 20px;
+		  font-style: italic;
+		}		
+		
+
+	</style>
+	
+</head> 
+
+<body>
+
+	<!-- Add Metro UI -->
+	<script src="https://cdn.metroui.org.ua/current/metro.js"></script>
+	
+	<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
+
+
+	<!-- Header -->
+	<script src="./header.js"></script>
+
+	<div id="center" class="center_text">	
+	<div class="container">
+	
+	<p>For all inquires please contact: </p>
+	
+
+	<div id="author" class="author-block">
+		<div class="author-text-block">
+		Nikolai Andrianov
+		</div>
+		<div class="post-date-block">
+		Geological Survey of Denmark and Greenland (GEUS)
+		</div>
+		<a href="https://www.linkedin.com/in/nikolai-andrianov-phd-22800910/">
+		<img class="author-photo" src="./media/na_linkedin_photo_small.jpg"> 
+		</a>
+	</div>	
+
+	
+	</div>	
+	</div>
+	
+	
+	<!-- Footer -->
+	<script src="./footer.js"></script>
+
+</body>
+</html>
