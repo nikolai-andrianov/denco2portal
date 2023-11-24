@@ -29,3 +29,8 @@ function destination(latlng, heading, distance) {
 	// return L.latLng([lat2 * radInv, lon2]);
 	return [lat2 * radInv, lon2];
 }
+
+/*
+Pauses execution for ms milliseconds (to be used in an async function)
+*/
+const timer = ms => new Promise(res => setTimeout(res, ms))

@@ -84,14 +84,11 @@
 	<div id="ctrl" class="control">
 	<div class="container">	
 	
-		<!-- 
-		<span class="mif-backward"></span>
-		<span class="mif-pause"></span>
-		<span class="mif-play"></span>
-		<span class="mif-forward"></span>
-		-->
+		<!--  Time controls -->
+		<span id="time-backward" class="mif-backward"></span>
+		<span id="time-play-pause" class="mif-play"></span>
+		<span id="time-forward" class="mif-forward"></span>
 	
-		
 		<!--  Menu with available time instants -->
 		<select id="menu-time">
 		</select>
@@ -132,13 +129,15 @@
 			var snapshotLayer; 
 			var latLngBounds;
 			
+			var time_play_toggled = true;
+			
 			const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 19,
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 				}).addTo(map);
 				
 			// Add scale
-			// The default topleft position is not displayed properly due to conflicts with the Metro CSS
+			// The default bottomleft position is not displayed properly due to conflicts with the Metro CSS
 			L.control.scale({imperial: false, position: 'topright'}).addTo(map); 
 				
 			/*
@@ -192,7 +191,7 @@
 			
 			let fname = dates_snapshots[selectedSnapshot].snapshot;
 			let image = "./stenlille/".concat(fname);	
-			img.src = image;	
+			img.src = image;			
 			
 			// If another item is chosen on the menu-time
 			$("#menu-time").change(function() {
@@ -203,11 +202,106 @@
 				// Assign the index of the selected snapshot
 				selectedSnapshot = $(this).val();
 				
-				console.log(selectedSnapshot);
+				// Apparently val() returns a string; convert it back to number to avoid that '4' + 1 == '41'
+				selectedSnapshot = Number(selectedSnapshot);
+				
+				//console.log(typeof selectedSnapshot);
+				//console.log(selectedSnapshot);
 
 				// Redraw the map 
 				drawMap();
 			});
+			
+			// If time forward is pressed
+			$("#time-forward").on("click", function() {
+
+				if (selectedSnapshot + 1 < dates_snapshots.length) {
+				
+					// Remove the current solution snapshot
+					map.removeLayer(snapshotLayer);
+					
+					// Increment the index of the selected snapshot
+					selectedSnapshot++;
+					
+					//console.log(typeof selectedSnapshot);
+					//console.log(selectedSnapshot);
+					
+					// Change the menu item
+					$("#menu-time").val(selectedSnapshot).change();
+
+					// Redrawing the map is done via #menu-time change			
+				}
+				
+			});	
+			
+			// If time backward is pressed
+			$("#time-backward").on("click", function() {
+
+				if (selectedSnapshot > 0) {
+				
+					// Remove the current solution snapshot
+					map.removeLayer(snapshotLayer);
+					
+					// Increment the index of the selected snapshot
+					selectedSnapshot--;
+					
+					//console.log(typeof selectedSnapshot);
+					//console.log(selectedSnapshot);
+					
+					// Change the menu item
+					$("#menu-time").val(selectedSnapshot).change();
+
+					// Redrawing the map is done via #menu-time change				
+				}
+				
+			});	
+
+			// If time play/pause is pressed
+			$("#time-play-pause").on("click", function() {
+			
+				if (time_play_toggled) {
+				
+					time_play_toggled = false;
+			
+					// Change icon to pause
+					$("#time-play-pause").toggleClass("mif-play", false);
+					$("#time-play-pause").toggleClass("mif-pause", true);
+					
+					async function load () { 				
+						let current = selectedSnapshot;
+						for (selectedSnapshot=current; selectedSnapshot<dates_snapshots.length; selectedSnapshot++) {
+
+							// Remove the current solution snapshot
+							map.removeLayer(snapshotLayer);
+							
+							// Redrawing the map is done via #menu-time change	
+							$("#menu-time").val(selectedSnapshot).change();
+				
+							// Exit if the pause button is clicked
+							if (time_play_toggled) {break;}
+							
+							// Pause for 100 milliseconds
+							await timer(100); 					
+						}
+						
+						// Change icon to back to play
+						$("#time-play-pause").toggleClass("mif-pause", false);
+						$("#time-play-pause").toggleClass("mif-play", true);
+	
+					}	
+					
+					load();		
+				}
+				else {
+				
+					time_play_toggled = true;
+					
+					// Change icon to back to play
+					$("#time-play-pause").toggleClass("mif-pause", false);
+					$("#time-play-pause").toggleClass("mif-play", true);	
+				}				
+				
+			});					
 
 			function drawMap() {
 			
