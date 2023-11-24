@@ -322,13 +322,13 @@
 				draggable.enable();	
 				*/
 				
+				// Make sure the snapshot is loaded
 				async function waitSnapshotLoaded() { 				
 					while (!map.hasLayer(snapshotLayer)) {						
 						// Pause for 100 milliseconds
 						await timer(100); 					
 					}
-				}	
-				
+				}					
 				waitSnapshotLoaded();	
 				
 			}
