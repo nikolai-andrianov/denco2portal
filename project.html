@@ -326,7 +326,7 @@
 				async function waitSnapshotLoaded() { 				
 					while (!map.hasLayer(snapshotLayer)) {						
 						// Pause for 100 milliseconds
-						await timer(100); 					
+						await timer(500); 					
 					}
 				}					
 				waitSnapshotLoaded();	
