@@ -16,6 +16,7 @@ headerDiv.innerHTML = `
 	<li><a href="blog.html">Blog</a></li> 
 	<li><a href="about.html">About</a></li>
 	<li><a href="disclaimer.html">Disclaimer</a></li>
+	<li><a href="contact.html">Contact</a></li>
 </ul>				
 `;
 document.body.appendChild(headerDiv);
