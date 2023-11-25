@@ -331,6 +331,13 @@
 					img.src = image;
 				}
 				else {
+				
+					/*
+					if (map.hasLayer(snapshotLayer)) {						
+						map.removeLayer(snapshotLayer);					
+					}
+					*/
+					
 					snapshotLayer = L.imageOverlay(image, latLngBounds, {
 						opacity: 0.7,
 						interactive: true
