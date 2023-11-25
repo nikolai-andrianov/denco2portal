@@ -156,7 +156,7 @@
 								.bindPopup(''.concat('<b>', wells[i].Name, '</b>')).openPopup();			
 			}
 			
-			// Load the snapshot at time=0 and get the image dimensions for this and for the subsequent snapshots
+			
 			let img = new Image();
 			img.onload = function() {
 				img.width = this.width;
@@ -308,46 +308,13 @@
 				let fname = dates_snapshots[selectedSnapshot].snapshot;
 				let image = "./stenlille/".concat(fname);				
 
-
-				if (selectedSnapshot > 0) {
-				
-					// console.log(selectedSnapshot);
-				
-				
-					let img = new Image();
-					img.onload = function() {
-
-						snapshotLayer = L.imageOverlay(image, latLngBounds, {
-							opacity: 0.7,
-							interactive: true
-						});
-						
-						// Draw the snapshot, corresponding to selectedSnapshot
-						map.addLayer(snapshotLayer);
-					}
-					
-					img.src = image;
-				}
-				else {
-					snapshotLayer = L.imageOverlay(image, latLngBounds, {
-						opacity: 0.7,
-						interactive: true
-					});		
-
-					// Draw the snapshot, corresponding to selectedSnapshot
-					map.addLayer(snapshotLayer);					
-				}
-		
-				
-				/*
 				snapshotLayer = L.imageOverlay(image, latLngBounds, {
 					opacity: 0.7,
 					interactive: true
-				});	
+				});
 				
 				// Draw the snapshot, corresponding to selectedSnapshot
 				map.addLayer(snapshotLayer);
-				*/
 				
 				/*
 				// Make the snapshot draggable
@@ -356,7 +323,6 @@
 				*/
 				
 				// Make sure the snapshot is loaded
-				/*
 				async function waitSnapshotLoaded() { 				
 					while (!map.hasLayer(snapshotLayer)) {						
 						// Pause for 100 milliseconds
@@ -364,7 +330,6 @@
 					}
 				}					
 				waitSnapshotLoaded();	
-				*/
 				
 			}
 		
