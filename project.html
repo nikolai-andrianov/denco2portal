@@ -197,7 +197,7 @@
 			$("#menu-time").change(function() {
 				
 			    // Remove the current solution snapshot
-			    map.removeLayer(snapshotLayer);
+			    //map.removeLayer(snapshotLayer);
 
 				// Assign the index of the selected snapshot
 				selectedSnapshot = $(this).val();
@@ -218,7 +218,7 @@
 				if (selectedSnapshot + 1 < dates_snapshots.length) {
 				
 					// Remove the current solution snapshot
-					map.removeLayer(snapshotLayer);
+					//map.removeLayer(snapshotLayer);
 					
 					// Increment the index of the selected snapshot
 					selectedSnapshot++;
@@ -240,7 +240,7 @@
 				if (selectedSnapshot > 0) {
 				
 					// Remove the current solution snapshot
-					map.removeLayer(snapshotLayer);
+					//map.removeLayer(snapshotLayer);
 					
 					// Increment the index of the selected snapshot
 					selectedSnapshot--;
@@ -316,6 +316,8 @@
 				
 					let img = new Image();
 					img.onload = function() {
+					
+						map.removeLayer(snapshotLayer);
 
 						snapshotLayer = L.imageOverlay(image, latLngBounds, {
 							opacity: 0.7,
