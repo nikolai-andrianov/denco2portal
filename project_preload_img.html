@@ -129,6 +129,8 @@
 			var snapshotLayer; 
 			var latLngBounds;
 			
+			var imageArray = [];
+			
 			var time_play_toggled = true;
 			
 			const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -156,18 +158,30 @@
 								.bindPopup(''.concat('<b>', wells[i].Name, '</b>'));			
 			}
 			
+			// Preload all images
+			var numLoadedImgs = 0;
+			for (let i=0; i<dates_snapshots.length; i++) {
+				imageArray.push(new Image());
+				let fname = dates_snapshots[i].snapshot;
+				let image = "./stenlille/".concat(fname);		
+				imageArray[i].src = image;				
+				imageArray[i].onload = function() {
+					numLoadedImgs++;	
+				}
+			}
 			
-			let img = new Image();
-			img.onload = function() {
-				img.width = this.width;
-			    img.height = this.height;
+			// Get the bounding box from the first image
+			imageArray[0].onload = function() {
+
+				let width = this.width;
+			    let height = this.height;
 						
 				// This ratio is obtained by getting the pixel distance between ST-1 and ST-9 in GIMP,
 				// and the distance in km between these wells in plot_stenlille.py
-				img.px2km = 0.91 / 58;
+				let px2km = 0.91 / 58;
 						
-				let imgWidthKm = img.width * img.px2km;
-				let imgHeightKm = img.height * img.px2km;
+				let imgWidthKm = width * px2km;
+				let imgHeightKm = height * px2km;
 
 				// Manually adjusted
 				let nw = [55.569329, 11.537189];
@@ -184,14 +198,13 @@
 				// Set up the NW-SE bounding box
 				latLngBounds = L.latLngBounds([nw, se]);
 				
+				console.log(latLngBounds);
+				
 				//console.log(latLngBounds);				
 				drawMap();
-
 			}
 			
-			let fname = dates_snapshots[selectedSnapshot].snapshot;
-			let image = "./stenlille/".concat(fname);	
-			img.src = image;			
+			
 			
 			// If another item is chosen on the menu-time
 			$("#menu-time").change(function() {
@@ -323,6 +336,7 @@
 				*/
 				
 				// Make sure the snapshot is loaded
+				/*
 				async function waitSnapshotLoaded() { 				
 					while (!map.hasLayer(snapshotLayer)) {						
 						// Pause for 100 milliseconds
@@ -330,6 +344,7 @@
 					}
 				}					
 				waitSnapshotLoaded();	
+					*/
 				
 			}
 		
