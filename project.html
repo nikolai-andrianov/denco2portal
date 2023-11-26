@@ -129,6 +129,8 @@
 			var snapshotLayer; 
 			var latLngBounds;
 			
+			var imageArray = [];
+			
 			var time_play_toggled = true;
 			
 			const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -153,21 +155,33 @@
 			let well_marker = []
 			for (var i=0;i<wells.length;i++) {
 				well_marker[i] = L.marker([wells[i].N_Degrees, wells[i].E_Degrees], { title: wells[i].Name }).addTo(map)
-								.bindPopup(''.concat('<b>', wells[i].Name, '</b>')).openPopup();			
+								.bindPopup(''.concat('<b>', wells[i].Name, '</b>'));			
 			}
 			
-			// Load the snapshot at time=0 and get the image dimensions for this and for the subsequent snapshots
-			let img = new Image();
-			img.onload = function() {
-				img.width = this.width;
-			    img.height = this.height;
+			// Preload all images
+			var numLoadedImgs = 0;
+			for (let i=0; i<dates_snapshots.length; i++) {
+				imageArray.push(new Image());
+				let fname = dates_snapshots[i].snapshot;
+				let image = "./stenlille/".concat(fname);		
+				imageArray[i].src = image;				
+				imageArray[i].onload = function() {
+					numLoadedImgs++;	
+				}
+			}
+			
+			// Get the bounding box from the first image
+			imageArray[0].onload = function() {
+
+				let width = this.width;
+			    let height = this.height;
 						
 				// This ratio is obtained by getting the pixel distance between ST-1 and ST-9 in GIMP,
 				// and the distance in km between these wells in plot_stenlille.py
-				img.px2km = 0.91 / 58;
+				let px2km = 0.91 / 58;
 						
-				let imgWidthKm = img.width * img.px2km;
-				let imgHeightKm = img.height * img.px2km;
+				let imgWidthKm = width * px2km;
+				let imgHeightKm = height * px2km;
 
 				// Manually adjusted
 				let nw = [55.569329, 11.537189];
@@ -184,20 +198,19 @@
 				// Set up the NW-SE bounding box
 				latLngBounds = L.latLngBounds([nw, se]);
 				
+				console.log(latLngBounds);
+				
 				//console.log(latLngBounds);				
 				drawMap();
-
 			}
 			
-			let fname = dates_snapshots[selectedSnapshot].snapshot;
-			let image = "./stenlille/".concat(fname);	
-			img.src = image;			
+			
 			
 			// If another item is chosen on the menu-time
 			$("#menu-time").change(function() {
 				
 			    // Remove the current solution snapshot
-			    //map.removeLayer(snapshotLayer);
+			    map.removeLayer(snapshotLayer);
 
 				// Assign the index of the selected snapshot
 				selectedSnapshot = $(this).val();
@@ -218,7 +231,7 @@
 				if (selectedSnapshot + 1 < dates_snapshots.length) {
 				
 					// Remove the current solution snapshot
-					//map.removeLayer(snapshotLayer);
+					map.removeLayer(snapshotLayer);
 					
 					// Increment the index of the selected snapshot
 					selectedSnapshot++;
@@ -240,7 +253,7 @@
 				if (selectedSnapshot > 0) {
 				
 					// Remove the current solution snapshot
-					//map.removeLayer(snapshotLayer);
+					map.removeLayer(snapshotLayer);
 					
 					// Increment the index of the selected snapshot
 					selectedSnapshot--;
@@ -308,55 +321,13 @@
 				let fname = dates_snapshots[selectedSnapshot].snapshot;
 				let image = "./stenlille/".concat(fname);				
 
-
-				if (selectedSnapshot > 0) {
-				
-					// console.log(selectedSnapshot);
-				
-				
-					let img = new Image();
-					img.onload = function() {
-					
-						map.removeLayer(snapshotLayer);
-
-						snapshotLayer = L.imageOverlay(image, latLngBounds, {
-							opacity: 0.7,
-							interactive: true
-						});
-						
-						// Draw the snapshot, corresponding to selectedSnapshot
-						map.addLayer(snapshotLayer);
-					}
-					
-					img.src = image;
-				}
-				else {
-				
-					/*
-					if (map.hasLayer(snapshotLayer)) {						
-						map.removeLayer(snapshotLayer);					
-					}
-					*/
-					
-					snapshotLayer = L.imageOverlay(image, latLngBounds, {
-						opacity: 0.7,
-						interactive: true
-					});		
-
-					// Draw the snapshot, corresponding to selectedSnapshot
-					map.addLayer(snapshotLayer);					
-				}
-		
-				
-				/*
 				snapshotLayer = L.imageOverlay(image, latLngBounds, {
 					opacity: 0.7,
 					interactive: true
-				});	
+				});
 				
 				// Draw the snapshot, corresponding to selectedSnapshot
 				map.addLayer(snapshotLayer);
-				*/
 				
 				/*
 				// Make the snapshot draggable
@@ -373,7 +344,7 @@
 					}
 				}					
 				waitSnapshotLoaded();	
-				*/
+					*/
 				
 			}
 		
