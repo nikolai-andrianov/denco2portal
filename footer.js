@@ -3,7 +3,16 @@
 let footerDiv = document.createElement("div");
 footerDiv.className = "footer";
 footerDiv.innerHTML = `
-<!-- <a href="disclaimer.html">Disclaimer</a> &nbsp; &#9679; &nbsp; &copy; CO<sub>2</sub> Portal 2023 &nbsp; &#9679; &nbsp; Last updated Nov 22 -->
-&copy; CO<sub>2</sub> Portal 2023 &nbsp; &#9679; &nbsp; Last updated Nov 26
+<br>
+<div class="container">
+	<div class="row justify-content-md-center">
+		<div class="col-lg-3">
+			<center>&copy; CO<sub>2</sub> Portal 2023</center>
+		</div>
+		<div class="col-lg-3">
+			<center>Last updated Nov 27</center>
+		</div>		
+	</div>
+</div>
 `;
 document.body.appendChild(footerDiv);
