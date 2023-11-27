@@ -42,6 +42,7 @@
 
 		.header {
 		  grid-area: hd;
+		  z-index: 100;
 		}
 		
 		.control {
@@ -50,6 +51,7 @@
 		
 		.center {
 		  grid-area: cn;
+		  z-index: 0;
 		}
 		
 		.footer {
@@ -80,11 +82,11 @@
 	<div class="container">	
 	
 		<!--  Time controls -->				
-		<span id="time-first" class='fas fa-step-backward'></span>
-		<span id="time-backward" class='fas fa-backward'></span>
-		<span id="time-play-pause" class='far fa-play-circle'></span>
-		<span id="time-forward" class='fas fa-forward'></span>
-		<span id="time-last" class='fas fa-step-forward'></span>
+		<span id="time-first" class='fas fa-step-backward' style="font-size:20px"></span> &nbsp;
+		<span id="time-backward" class='fas fa-backward' style="font-size:20px"></span>  &nbsp;
+		<span id="time-play-pause" class='far fa-play-circle' style="font-size:20px"></span> &nbsp;
+		<span id="time-forward" class='fas fa-forward' style="font-size:20px"></span> &nbsp;
+		<span id="time-last" class='fas fa-step-forward' style="font-size:20px"></span> &nbsp; &nbsp;
 		
 		<!--  Menu with available time instants -->
 		<select id="menu-time">
