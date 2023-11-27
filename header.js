@@ -14,7 +14,7 @@ headerDiv.innerHTML = `
 				<li class="nav-item dropdown" style="text-align: right;">
 					<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Project</a>
 					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="project.html">Stenlille</a></li>
+						<li><a class="dropdown-item" style="text-align: right;" href="project.html">Stenlille</a></li>
 					</ul>
 				</li>			
 				<li class="nav-item" style="text-align: right;">
