@@ -10,16 +10,6 @@
 	<!-- Add Leaflet classes -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-	
-	
-	<!-- Add a local version of Leaflet 
-	<script src="leaflet_local.js"></script>
-	<link href="leaflet_local.css" rel="stylesheet" />
-	-->
-
-	<!-- Add Opacity -->
-	<script src="scripts/L.Control.Opacity.js"></script>
-	<link href="scriptsL.Control.Opacity.css" rel="stylesheet" />
 
 	<!-- Add Bootstrap UI 	-->	 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -88,7 +78,6 @@
 	
 	<script>
 	
-
 		// Set view to see all structures
 		const map = L.map('map').setView([55.909194, 10.255737], 7);
 
@@ -123,11 +112,6 @@
 					opacity: 0.7,
 					interactive: true
 				});	
-
-
-		//let stenlille_contour = L.polygon(stenlille, {color: "red"}).addTo(map)
-		//let stenlille_contour = L.polygon(stenlille).addTo(map)
-
 
 		// Define the structures' contours
 		// For Stenlille, open the project; for others - just a popup		
@@ -167,16 +151,22 @@
 		for (s = 0; s < n.length; s++) ctrl._map.hasLayer(n[s]) || ctrl._map.addLayer(n[s]);
 		ctrl._refocusOnMap()
 
-		
-		function onMapClick(e) {
+		// Add mouse click event listeners
+		function onLeftClick(e) {
 			L.popup()
 				.setLatLng(e.latlng)
 				.setContent(`${e.latlng.toString()}`)
 				.openOn(map);
 		}	
-		map.on('click', onMapClick);		
+		map.on('click', onLeftClick);		
 		
-		
+		function onRightClick(e) {
+			L.popup()
+				.setLatLng(e.latlng)
+				.setContent(`${e.latlng.toString()}`)
+				.openOn(map);
+		}	
+		map.on('contextmenu', onRightClick);
 		
 		
 	</script>	
