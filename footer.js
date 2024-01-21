@@ -7,7 +7,7 @@ footerDiv.innerHTML = `
 <div class="container">
 	<div class="row justify-content-md-center">
 		<div class="col-lg-3">
-			<center>&copy; CO<sub>2</sub> Portal 2023</center>
+			<center>&copy; CO<sub>2</sub> Portal 2024</center>
 		</div>
 		<div class="col-lg-3">
 			<center>Last updated Jan 21</center>
