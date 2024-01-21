@@ -10,6 +10,16 @@
 	<!-- Add Leaflet classes -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+	
+	
+	<!-- Add a local version of Leaflet 
+	<script src="leaflet_local.js"></script>
+	<link href="leaflet_local.css" rel="stylesheet" />
+	-->
+
+	<!-- Add Opacity -->
+	<script src="scripts/L.Control.Opacity.js"></script>
+	<link href="scriptsL.Control.Opacity.css" rel="stylesheet" />
 
 	<!-- Add Bootstrap UI 	-->	 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -78,31 +88,97 @@
 	
 	<script>
 	
+
 		// Set view to see all structures
-		const map = L.map('map').setView([55.909194, 10.255737], 7);		
-		const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		const map = L.map('map').setView([55.909194, 10.255737], 7);
+
+		// OSM layer 
+		const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			maxZoom: 19,
 			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-			}).addTo(map);
+			});
 			
 		// Add scale
-		// The default topleft position is not displayed properly due to conflicts with the Metro CSS
 		L.control.scale({imperial: false, position: 'topright'}).addTo(map); 
 		
-		// Plot the structures' contours
-		const stenlille_contour = L.polygon(stenlille).addTo(map)
-		const havnsoe_contour = L.polygon(havnsoe).addTo(map).bindPopup('Havnsø');
-		const gassum_contour = L.polygon(gassum).addTo(map).bindPopup('Gassum');
-		const thorning_contour = L.polygon(thorning).addTo(map).bindPopup('Thorning');
-		const roedby_contour = L.polygon(roedby).addTo(map).bindPopup('Rødby');
-		const lisa_contour = L.polygon(lisa).addTo(map).bindPopup('Lisa');
-		const _contour = L.polygon(inez).addTo(map).bindPopup('Inez');
-		const inez_contour = L.polygon(jammerbugt).addTo(map).bindPopup('Jammerbugt');		
+		// Add an empty control 
+		var layerControl = L.control.layers(null, null, {collapsed: false}).addTo(map);
+		
+		// Bounding box for the top and base Gassum maps
+		// Converted from the EPSG:3857 projected coordinates 870199.7523 7255482.7536
+		let sw = [54.448104, 7.8171374];
+		// Converted from the projected coordinates 1447428.6961 7929078.864
+		let ne = [57.817507, 13.002473];				
+		let latLngBounds = L.latLngBounds([sw, ne]);
+		
+		// Define the layers for top and base Gassum maps
+		let gassumTopMap = "./layers/gassum_top.png";	
+		let gassumBaseMap = "./layers/gassum_base.png";	
+		
+		let gassumTopLayer = L.imageOverlay(gassumTopMap, latLngBounds, {
+					opacity: 0.7,
+					interactive: true
+				});
+		let gassumBaseLayer = L.imageOverlay(gassumBaseMap, latLngBounds, {
+					opacity: 0.7,
+					interactive: true
+				});	
 
-		// For Stenlille, open the project
-		stenlille_contour.on('click', function(evt) { 
-			window.open("./project.html")
-		});
+
+		//let stenlille_contour = L.polygon(stenlille, {color: "red"}).addTo(map)
+		//let stenlille_contour = L.polygon(stenlille).addTo(map)
+
+
+		// Define the structures' contours
+		// For Stenlille, open the project; for others - just a popup		
+		let structures = [L.polygon(stenlille).on('click', function(evt) { window.open("./project.html") }),
+						  L.polygon(havnsoe).bindPopup('Havnsø'),
+						  L.polygon(gassum).bindPopup('Gassum'),		
+						  L.polygon(thorning).bindPopup('Thorning'),
+						  L.polygon(roedby).bindPopup('Rødby'),
+						  L.polygon(lisa).bindPopup('Lisa'),
+					      L.polygon(inez).bindPopup('Inez'),
+					      L.polygon(jammerbugt).bindPopup('Jammerbugt')
+						  ];
+		
+		// Color the structures with red
+		for (s = 0; s < structures.length; s++) structures[s].setStyle({color: "red"});
+			
+		// Define the layer with the structures
+		let structuresLayer = L.layerGroup(structures);
+			
+		// Add all layers as overlays (no base map)
+		layerControl.addOverlay(osmLayer, "Map");
+		layerControl.addOverlay(gassumTopLayer, "Top Gassum");
+		layerControl.addOverlay(gassumBaseLayer, "Base Gassum");
+		let ctrl = layerControl.addOverlay(structuresLayer, "Structures");
+			
+		// Check the map & the structures layers
+		ctrl._layerControlInputs[0].defaultChecked = true
+		ctrl._layerControlInputs[3].defaultChecked = true
+
+		// Visulize the checked layers 
+		// (copy-paste from _onInputClick() in leaflet_local.js line 1854) 
+		var t, e, i = ctrl._layerControlInputs,
+                        n = [],
+                        o = [];
+		for (var s = i.length - 1; 0 <= s; s--) t = i[s], e = ctrl._getLayer(t.layerId).layer, t.checked ? n.push(e) : t.checked || o.push(e);
+		for (s = 0; s < o.length; s++) ctrl._map.hasLayer(o[s]) && ctrl._map.removeLayer(o[s]);
+		for (s = 0; s < n.length; s++) ctrl._map.hasLayer(n[s]) || ctrl._map.addLayer(n[s]);
+		ctrl._refocusOnMap()
+
+		
+		function onMapClick(e) {
+			L.popup()
+				.setLatLng(e.latlng)
+				.setContent(`${e.latlng.toString()}`)
+				.openOn(map);
+		}	
+		map.on('click', onMapClick);		
+		
+		
+		
+		
 	</script>	
 
 	
