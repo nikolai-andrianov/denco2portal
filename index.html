@@ -152,19 +152,41 @@
 		ctrl._refocusOnMap()
 
 		// Add mouse click event listeners
+		/*
 		function onLeftClick(e) {
 			L.popup()
 				.setLatLng(e.latlng)
 				.setContent(`${e.latlng.toString()}`)
 				.openOn(map);
 		}	
-		map.on('click', onLeftClick);		
+		map.on('click', onLeftClick);	
+		*/		
+		
+		let newWellSpecs = '<b>Create a vertical injection well</b> \
+					<hr>  \
+					Degrees latitude<br> \
+					Degrees longitude \
+					<hr> \
+					<button onclick="newWellDialog.close()">Ok</button> \
+					<button onclick="newWellDialog.close()">Cancel</button> \
+					'
+		var newWellDialog = L.popup({
+			closeButton: false,
+			autoClose: false,
+			closeOnClick: false,
+			closeOnEscapeKey: false
+		})
+		.setContent(newWellSpecs);
+		
 		
 		function onRightClick(e) {
-			L.popup()
-				.setLatLng(e.latlng)
-				.setContent(`${e.latlng.toString()}`)
-				.openOn(map);
+				
+			if (!newWellDialog.isOpen()) {
+				newWellDialog
+					.setLatLng(e.latlng)
+					.openOn(map);
+			}	
+
 		}	
 		map.on('contextmenu', onRightClick);
 		
