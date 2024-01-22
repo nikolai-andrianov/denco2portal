@@ -162,14 +162,16 @@
 		map.on('click', onLeftClick);	
 		*/		
 		
+		// A template for the New well creation dialog
 		let newWellSpecs = '<b>Create a vertical injection well</b> \
-					<hr>  \
-					Degrees latitude<br> \
-					Degrees longitude \
-					<hr> \
-					<button onclick="newWellDialog.close()">Ok</button> \
-					<button onclick="newWellDialog.close()">Cancel</button> \
-					'
+							<hr>  \
+							Degrees latitude <input id="number" type="number" value="$lat" /><br> \
+							Degrees longitude <input id="number" type="number" value="$lng" />\
+							<hr> \
+							<button onclick="newWellDialog.close()">Ok</button> \
+							<button onclick="newWellDialog.close()">Cancel</button> \
+							'
+					
 		var newWellDialog = L.popup({
 			closeButton: false,
 			autoClose: false,
@@ -181,11 +183,15 @@
 		
 		function onRightClick(e) {
 				
+			// Allow for just one dialog at a time
 			if (!newWellDialog.isOpen()) {
+				// Update the well coordinates wit the current latlng  
+				newWellDialog._content = newWellDialog._content.replace("$lat", e.latlng.lat.toString())
+				newWellDialog._content = newWellDialog._content.replace("$lng", e.latlng.lng.toString())
 				newWellDialog
 					.setLatLng(e.latlng)
 					.openOn(map);
-			}	
+			}
 
 		}	
 		map.on('contextmenu', onRightClick);
