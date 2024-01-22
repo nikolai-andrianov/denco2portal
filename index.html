@@ -165,8 +165,8 @@
 		// A template for the New well creation dialog
 		let newWellSpecs = '<b>Create a vertical injection well</b> \
 							<hr>  \
-							Degrees latitude <input id="number" type="number" value="$lat" /><br> \
-							Degrees longitude <input id="number" type="number" value="$lng" />\
+							Degrees latitude <input id="number" type="number" value="0" /><br> \
+							Degrees longitude <input id="number" type="number" value="0" />\
 							<hr> \
 							<button onclick="newWellDialog.close()">Ok</button> \
 							<button onclick="newWellDialog.close()">Cancel</button> \
@@ -185,12 +185,15 @@
 				
 			// Allow for just one dialog at a time
 			if (!newWellDialog.isOpen()) {
-				// Update the well coordinates wit the current latlng  
-				newWellDialog._content = newWellDialog._content.replace("$lat", e.latlng.lat.toString())
-				newWellDialog._content = newWellDialog._content.replace("$lng", e.latlng.lng.toString())
+				// Create the well dialog with dummy (0, 0) values in in the input boxes
 				newWellDialog
 					.setLatLng(e.latlng)
 					.openOn(map);
+					
+			// Update the values in the input boxes
+			document.getElementById('idWellLat').value = e.latlng.lat;
+			document.getElementById('idWellLng').value = e.latlng.lng;
+				
 			}
 
 		}	
