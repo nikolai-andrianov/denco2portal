@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+	<!-- Add the left menu pane -->
+	<script src="scripts/L.Control.Pane.js"></script>
+
 	<!-- Add Bootstrap UI 	-->	 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -47,9 +50,15 @@
 		  grid-area: ft;
 		}
 		
-		#nav {
-    z-index: 9999;
-}
+		.create-well-dialog {
+		  display: grid;
+		  grid-template-columns: auto fit-content(2px) auto;
+		  padding: 0px;
+		}
+		.well-item {
+		  padding-inline: 5px; /* Horizontal */
+		  padding-block: 5px; /* Vertical */
+		}
 		
 	</style>
 	
@@ -78,8 +87,9 @@
 	
 	<script>
 	
+		// Create a map without the default zoom
 		// Set view to see all structures
-		const map = L.map('map').setView([55.909194, 10.255737], 7);
+		const map = L.map('map', {zoomControl: false}).setView([55.909194, 10.255737], 7);
 
 		// OSM layer 
 		const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -89,10 +99,7 @@
 			
 		// Add scale
 		L.control.scale({imperial: false, position: 'topright'}).addTo(map); 
-		
-		// Add an empty control 
-		var layerControl = L.control.layers(null, null, {collapsed: false}).addTo(map);
-		
+
 		// Bounding box for the top and base Gassum maps
 		// Converted from the EPSG:3857 projected coordinates 870199.7523 7255482.7536
 		let sw = [54.448104, 7.8171374];
@@ -130,26 +137,23 @@
 			
 		// Define the layer with the structures
 		let structuresLayer = L.layerGroup(structures);
-			
-		// Add all layers as overlays (no base map)
-		layerControl.addOverlay(osmLayer, "Map");
-		layerControl.addOverlay(gassumTopLayer, "Top Gassum");
-		layerControl.addOverlay(gassumBaseLayer, "Base Gassum");
-		let ctrl = layerControl.addOverlay(structuresLayer, "Structures");
-			
-		// Check the map & the structures layers
-		ctrl._layerControlInputs[0].defaultChecked = true
-		ctrl._layerControlInputs[3].defaultChecked = true
+		
+		var checked = true;
+		const inputLayers = {
+			"Map": [osmLayer, checked],
+			"Top Gassum": [gassumTopLayer, !checked],
+			"Base Gassum": [gassumBaseLayer, !checked],
+			"Structures": [structuresLayer, checked],
+		};
 
-		// Visulize the checked layers 
-		// (copy-paste from _onInputClick() in leaflet_local.js line 1854) 
-		var t, e, i = ctrl._layerControlInputs,
-                        n = [],
-                        o = [];
-		for (var s = i.length - 1; 0 <= s; s--) t = i[s], e = ctrl._getLayer(t.layerId).layer, t.checked ? n.push(e) : t.checked || o.push(e);
-		for (s = 0; s < o.length; s++) ctrl._map.hasLayer(o[s]) && ctrl._map.removeLayer(o[s]);
-		for (s = 0; s < n.length; s++) ctrl._map.hasLayer(n[s]) || ctrl._map.addLayer(n[s]);
-		ctrl._refocusOnMap()
+		// Add the left menu pane
+		L.control
+			.pane(inputLayers, {
+				label: "Layers",
+				collapsed: false,
+			})
+			.addTo(map);
+			
 
 		// Add mouse click event listeners
 		/*
@@ -162,21 +166,32 @@
 		map.on('click', onLeftClick);	
 		*/		
 		
-		// A template for the New well creation dialog
+		/*
+		decimal
+		places	degrees		distance
+		0		1.0			111 km
+		1		0.1			11.1 km
+		2		0.01		1.11 km
+		3		0.001		111 m
+		4		0.0001		11.1 m
+		5		0.00001		1.11 m
+		*/
+		// A template for the New well creation dialog		
+		// Input box maxlength does not work for type="number"		
 		let newWellSpecs = '<b>Create a vertical injection well</b> \
 							<hr>  \
-							Degrees latitude <input id="idWellLat" type="number" value="0" /><br> \
-							Degrees longitude <input id="idWellLng" type="number" value="0" />\
-							<hr> \
-							Top completion <input id="idTopComp" type="number" value="0" /><br> \
-							Bottom completion <input id="idBottomComp" type="number" value="0" />\
-							<hr> \
-							CO<sub>2</sub> injection rate <input id="idWellLng" type="number" value="0" />\
-							<hr> \
-							<button onclick="newWellDialog.close()">Ok</button> \
-							<button onclick="newWellDialog.close()">Cancel</button> \
-							'
-					
+							<div class="create-well-dialog"> \
+							<div class="well-item">Latitude</div><div class="well-item"><input id="idWellLat" type="text" value="0" maxlength="5" size="5"/></div><div class="well-item">deg</div> \
+							<div class="well-item">Longitude</div><div class="well-item"><input id="idWellLng" type="text" value="0" maxlength="5" size="5"/></div><div class="well-item">deg</div> \
+							<div class="well-item">Top completion</div><div class="well-item"><input id="idTopComp" type="text" value="0" maxlength="5" size="5"/></div><div class="well-item">m</div> \
+							<div class="well-item">Bottom completion</div><div class="well-item"><input id="idBottomComp" type="text" value="0" maxlength="5" size="5"/></div><div class="well-item">m</div> \
+							<div class="well-item">CO<sub>2</sub> injection rate</div><div class="well-item"><input id="idCO2injRate" type="text" value="0" maxlength="5" size="5"/></div><div class="well-item">Mta</div> \
+							<div class="well-item"></div><div class="well-item"></div><div class="well-item"></div> \
+							<div class="well-item"><button onclick="newWellDialog.close()">Ok</button></div> \
+							<div class="well-item"></div> \
+							<div class="well-item"><button onclick="newWellDialog.close()">Cancel</button></div> \
+							</div> <br> \
+							'		
 					
 		var newWellDialog = L.popup({
 			closeButton: false,
@@ -196,9 +211,10 @@
 					.setLatLng(e.latlng)
 					.openOn(map);
 					
-			// Update the values in the input boxes
-			document.getElementById('idWellLat').value = e.latlng.lat;
-			document.getElementById('idWellLng').value = e.latlng.lng;
+			// Update the values in the input boxes 
+			// Round to 5 decimal places, which correspond to the accuracy of 1.11 m
+			document.getElementById('idWellLat').value = Math.round(e.latlng.lat * 1e5) / 1e5;
+			document.getElementById('idWellLng').value = Math.round(e.latlng.lng * 1e5) / 1e5;
 				
 			}
 
