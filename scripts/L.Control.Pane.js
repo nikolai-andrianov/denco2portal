@@ -17,6 +17,8 @@ L.Control.Pane = L.Control.extend({
                 checked: inputLayers[i][1],
 			});
 		}
+
+        this._wells = [];
     },
 	// Extending from the parent class
     onAdd: function (map) {
@@ -38,6 +40,47 @@ L.Control.Pane = L.Control.extend({
         }
         return this;
     },	
+	addGroup: function () {
+		// Check if the inputs make sense
+		if (!document.getElementById('idWellName').value) {
+            document.getElementById('idWellName').style.borderWidth = "1px";
+            document.getElementById('idWellName').style.borderColor = "red";
+            return;
+		}
+        else {
+            document.getElementById('idWellName').style.borderWidth = '0.5px';
+            document.getElementById('idWellName').style.borderColor = "black";
+        }
+
+        if (document.getElementById('idCO2injRate').value <= 0) {
+            document.getElementById('idCO2injRate').style.borderWidth = "1px";
+            document.getElementById('idCO2injRate').style.borderColor = "red";
+            return;
+		}
+        else {
+            document.getElementById('idCO2injRate').style.borderWidth = '0.5px'; 
+            document.getElementById('idCO2injRate').style.borderColor = "black";
+        }
+
+        let wellName = document.getElementById('idWellName').value;
+		
+        // If there are no wells yet, add the label for the wells group
+        if (this._wells.length == 0) {
+            const wellsGroupLabel = document.createElement('label');
+            wellsGroupLabel.innerHTML = "<hr><b>Wells</b>";
+            this._container.appendChild(wellsGroupLabel);	
+        }
+
+        // Add the new well to the wells group
+        const wellLabel = document.createElement('label');
+        wellLabel.innerHTML = '&nbsp;&nbsp;' + wellName;
+        this._container.appendChild(wellLabel);	
+        this._wells.push(wellName)
+
+        // Now we can close the dialog
+        newWellDialog.close()
+
+	},	
 	_initLayout: function () {
 	const className = 'leaflet-control-layers',
 		container = (this._container = L.DomUtil.create('div', className)),
@@ -79,7 +122,7 @@ L.Control.Pane = L.Control.extend({
         }
 
         this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
-        container.appendChild(form);		
+        container.appendChild(form);			
 	},	
 	// Called from the redefined onAdd() method
     _update: function () {

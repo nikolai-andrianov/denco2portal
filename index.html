@@ -60,6 +60,10 @@
 		  padding-block: 5px; /* Vertical */
 		}
 		
+		.red-border{
+		  border: 1px solid red;
+		}
+		
 	</style>
 	
 </head> 
@@ -150,13 +154,12 @@
 		};
 
 		// Add the left menu pane
-		L.control
-			.pane(inputLayers, {
-				label: "Layers",
-				collapsed: false,
-			})
-			.addTo(map);
-			
+		var ctrl = L.control
+					.pane(inputLayers, {
+						label: "Layers",
+						collapsed: false,
+					});
+		ctrl.addTo(map);
 
 		// Add mouse click event listeners
 		/*
@@ -191,7 +194,7 @@
 							<div class="well-item">Bottom completion</div><div class="well-item"><input id="idBottomComp" type="text" value="0" maxlength="5" size="5"/></div><div class="well-item">m</div> \
 							<div class="well-item">CO<sub>2</sub> injection rate</div><div class="well-item"><input id="idCO2injRate" type="text" value="0" maxlength="5" size="5"/></div><div class="well-item">Mta</div> \
 							<div class="well-item"></div><div class="well-item"></div><div class="well-item"></div> \
-							<div class="well-item"><button onclick="newWellDialog.close()">Ok</button></div> \
+							<div class="well-item"><button onclick="ctrl.addGroup()">Ok</button></div> \
 							<div class="well-item"></div> \
 							<div class="well-item"><button onclick="newWellDialog.close()">Cancel</button></div> \
 							</div> <br> \
