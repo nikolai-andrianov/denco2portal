@@ -90,6 +90,9 @@
 		// Create a map without the default zoom
 		// Set view to see all structures
 		const map = L.map('map', {zoomControl: false}).setView([55.909194, 10.255737], 7);
+		
+		// Create the zoom in the top-right corner
+		L.control.zoom({position: 'topright'}).addTo(map);
 
 		// OSM layer 
 		const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
