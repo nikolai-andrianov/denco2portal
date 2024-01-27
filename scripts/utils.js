@@ -72,9 +72,9 @@ function wellDialogContents(param) {
 	return '<b>' + title + '</b> \
 			<hr>  \
 			<div class="create-well-dialog"> \
-			<div class="well-item">Well name</div><div class="well-item"><input id="idWellName_' + id + '" type="text" value="' + wellName + '" size="5"/></div><div class="well-item"></div> \
-			<div class="well-item">Latitude</div><div class="well-item"><input id="idWellLat_' + id + '" type="text" value="' + lat + '" maxlength="5" size="5"/></div><div class="well-item">deg</div> \
-			<div class="well-item">Longitude</div><div class="well-item"><input id="idWellLng_' + id + '" type="text" value="' + lng + '" maxlength="5" size="5"/></div><div class="well-item">deg</div> \
+			<div class="well-item">Well name</div><div class="well-item"><input id="idWellName_' + id + '" type="text" value="' + wellName + '" maxlength="15" size="5"/></div><div class="well-item"></div> \
+			<div class="well-item">Latitude</div><div class="well-item"><input id="idWellLat_' + id + '" type="text" value="' + lat + '" maxlength="8" size="5"/></div><div class="well-item">deg</div> \
+			<div class="well-item">Longitude</div><div class="well-item"><input id="idWellLng_' + id + '" type="text" value="' + lng + '" maxlength="8" size="5"/></div><div class="well-item">deg</div> \
 			<div class="well-item">Top completion</div><div class="well-item"><input id="idTopComp_' + id + '" type="text" value="' + topComp + '" maxlength="5" size="5"/></div><div class="well-item">m</div> \
 			<div class="well-item">Bottom completion</div><div class="well-item"><input id="idBottomComp_' + id + '" type="text" value="' + bottomComp + '" maxlength="5" size="5"/></div><div class="well-item">m</div> \
 			<div class="well-item">CO<sub>2</sub> injection rate</div><div class="well-item"><input id="idCO2injRate_' + id + '" type="text" value="' + injRate + '" maxlength="5" size="5"/></div><div class="well-item">Mta</div> \
@@ -131,3 +131,20 @@ function onWellMove(id, lat, lng) {
 // 	//t.openPopup('ss');
 // 	a = 1;
 // }
+
+// Open a Well edit dialog if the well control is clicked
+function onWellCtrlClick(t, e) {
+
+	// Get the well ID
+	let token = e.currentTarget.id.split('_');
+	let id = Number(token[1]);
+	
+	// Open the popup and pan the map to the well location
+	ctrl._wells[id].marker.openPopup();
+	map.panTo(ctrl._wells[id].marker.getLatLng());
+	
+	// Needed to keep the popup open, see https://stackoverflow.com/questions/24067946/cant-open-popup-programmatically
+	e.stopPropagation();
+	e.preventDefault();
+	
+}

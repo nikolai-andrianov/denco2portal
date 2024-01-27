@@ -62,29 +62,96 @@ L.Control.Group = L.Control.extend({
         }
 		
 	},
-    // Add new (options.id==-1) or edit an existing (options.id>=0) well 
+    // Add new or edit an existing well 
 	modifyWell: function (options) {
-		// Check if the inputs make sense
+		
+		// Get well data
 		let strId = '_' + options.id;
-		if (!document.getElementById('idWellName' + strId).value) {
-            document.getElementById('idWellName' + strId).style.borderWidth = "1px";
-            document.getElementById('idWellName' + strId).style.borderColor = "red";
+        let wellName = document.getElementById('idWellName' + strId);
+		let wellLat = document.getElementById('idWellLat' + strId);
+		let wellLng = document.getElementById('idWellLng' + strId);
+        let topComp = document.getElementById('idTopComp' + strId);
+		let bottomComp = document.getElementById('idBottomComp' + strId);
+		let injRate = document.getElementById('idCO2injRate' + strId);
+		
+		// Check if the inputs make sense
+		if (!wellName.value) {
+            wellName.style.borderWidth = "0.5px";
+            wellName.style.borderColor = "red";
             return;
 		}
         else {
-            document.getElementById('idWellName' + strId).style.borderWidth = '0.5px';
-            document.getElementById('idWellName' + strId).style.borderColor = "black";
+            wellName.style.borderWidth = '0.5px';
+            wellName.style.borderColor = "black";
         }
 
-        if (document.getElementById('idCO2injRate' + strId).value <= 0) {
-            document.getElementById('idCO2injRate' + strId).style.borderWidth = "1px";
-            document.getElementById('idCO2injRate' + strId).style.borderColor = "red";
+        if (isNaN(wellLat.value)) {
+            wellLat.style.borderWidth = "0.5px";
+            wellLat.style.borderColor = "red";
             return;
 		}
         else {
-            document.getElementById('idCO2injRate' + strId).style.borderWidth = '0.5px'; 
-            document.getElementById('idCO2injRate' + strId).style.borderColor = "black";
+            wellLat.style.borderWidth = '0.5px'; 
+            wellLat.style.borderColor = "black";
         }
+		
+        if (isNaN(wellLng.value)) {
+            wellLng.style.borderWidth = "0.5px";
+            wellLng.style.borderColor = "red";
+            return;
+		}
+        else {
+            wellLng.style.borderWidth = '0.5px'; 
+            wellLng.style.borderColor = "black";
+        }
+
+        if (isNaN(topComp.value)) {
+            topComp.style.borderWidth = "0.5px";
+            topComp.style.borderColor = "red";
+            return;
+		}
+        else {
+            topComp.style.borderWidth = '0.5px'; 
+            topComp.style.borderColor = "black";
+        }
+		
+        if (isNaN(bottomComp.value)) {
+            bottomComp.style.borderWidth = "0.5px";
+            bottomComp.style.borderColor = "red";
+            return;
+		}
+        else {
+            bottomComp.style.borderWidth = '0.5px'; 
+            bottomComp.style.borderColor = "black";
+        }		
+		
+        if (isNaN(injRate.value)) {
+            injRate.style.borderWidth = "0.5px";
+            injRate.style.borderColor = "red";
+            return;
+		}
+        else {
+            injRate.style.borderWidth = '0.5px'; 
+            injRate.style.borderColor = "black";
+        }
+		
+        if (Number(injRate.value) <= 0) {
+            injRate.style.borderWidth = "0.5px";
+            injRate.style.borderColor = "red";
+            return;
+		}
+        else {
+            injRate.style.borderWidth = '0.5px'; 
+            injRate.style.borderColor = "black";
+        }
+		
+		// Get the values for the input parameters
+		wellName = wellName.value;
+		wellLat = Number(wellLat.value);
+		wellLng = Number(wellLng.value);
+        topComp = Number(topComp.value);
+		bottomComp = Number(bottomComp.value);
+		injRate = Number(injRate.value);
 		
         // If there are no wells yet, add the label for the wells group
         if (this._wells.length == 0) {
@@ -94,23 +161,34 @@ L.Control.Group = L.Control.extend({
             this._container.appendChild(wellsGroupLabel);	
         }
 		
-		// Get well data
-        let wellName = document.getElementById('idWellName' + strId).value;
-		let wellLat = Number(document.getElementById('idWellLat' + strId).value);
-		let wellLng = Number(document.getElementById('idWellLng' + strId).value);
-        let topComp = Number(document.getElementById('idTopComp' + strId).value);
-		let bottomComp = Number(document.getElementById('idBottomComp' + strId).value);
-		let injRate = Number(document.getElementById('idCO2injRate' + strId).value);
-		
 		// Round latlng to 5 decimal places, which correspond to the accuracy of 1.11 m
 		wellLat = Math.round(wellLat * 1e5) / 1e5;
 		wellLng = Math.round(wellLng * 1e5) / 1e5;
 		
         // If modifyWell is called via the New well dialog, ...
         if (options.newWell) {
-            // Add the new well to the wells group
-            const wellLabel = document.createElement('label');
-            wellLabel.innerHTML = '<span id="idWellNameCtrl_' + this._wellIDcounter + '">' + '&nbsp;&nbsp;' + wellName + '</span>';	
+			
+            // Add the new well to the Wells control group
+			const span_indent = document.createElement('span');
+			span_indent.innerHTML = '&nbsp;&nbsp;';
+			
+			const span = document.createElement('span');
+			span.appendChild(span_indent);
+
+			const linkLabel = document.createElement('a');
+			linkLabel.setAttribute('id', 'idWellNameCtrl_' + this._wellIDcounter);
+			linkLabel.href = '#';
+			linkLabel.innerText = wellName;
+			
+			linkLabel.addEventListener('click', (event) => {
+				onWellCtrlClick(this, event);
+			});
+			
+			span.appendChild(linkLabel);
+			
+			const wellLabel = document.createElement('label');
+			wellLabel.appendChild(span);
+
             this._container.appendChild(wellLabel);	
             
             // Add a draggable well marker on the map
@@ -174,7 +252,7 @@ L.Control.Group = L.Control.extend({
             this._wells[id].marker._popup.close()
 
             // Update the eventually changed well name in the control panel
-            document.getElementById('idWellNameCtrl_' + id).innerHTML = '&nbsp;&nbsp;' + wellName;
+            document.getElementById('idWellNameCtrl_' + id).innerHTML = wellName;
 
             // Update the eventually changed location of the well marker
             this._wells[id].marker.setLatLng([wellLat, wellLng]); 
@@ -222,8 +300,8 @@ L.Control.Group = L.Control.extend({
 			} else {
 				this._map.addLayer(layer);
 			}
-
         });
+		
 		const label = document.createElement('label');
         const span = document.createElement('span');
 		const span_indent = document.createElement('span');
