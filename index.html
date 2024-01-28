@@ -70,6 +70,9 @@
 </head> 
 
 <body>
+
+	<!-- Denmark's borders 	-->	
+	<script src="./layers/denmark_borders.js"></script>
 	
 	<!-- Coordinates of the structures 	-->	
 	<script src="./structures/stenlille_structure.js"></script>
@@ -107,7 +110,15 @@
 			
 		// Add scale
 		L.control.scale({imperial: false, position: 'topright'}).addTo(map); 
-
+		
+		// Define a layer with Denmark's borders
+		let dkPolyBorders = [];
+		for (let n = 0; n < denmark_borders.length; n++) { 
+			dkPolyBorders.push(L.polygon(denmark_borders[n]));
+			dkPolyBorders[n].setStyle({color: 'black', fillOpacity: 0});
+		}
+		let dkBorderLayer = L.layerGroup(dkPolyBorders);
+		
 		// Bounding box for the top and base Gassum maps
 		// Converted from the EPSG:3857 projected coordinates 870199.7523 7255482.7536
 		let sw = [54.448104, 7.8171374];
@@ -149,6 +160,7 @@
 		var checked = true;
 		const inputLayers = {
 			"Map": [osmLayer, checked],
+			"Denmark borders": [dkBorderLayer, !checked],			
 			"Top Gassum": [gassumTopLayer, !checked],
 			"Base Gassum": [gassumBaseLayer, !checked],
 			"Structures": [structuresLayer, checked],
