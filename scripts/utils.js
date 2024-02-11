@@ -51,7 +51,7 @@ function wellDialogContents(param) {
 		topComp = param.topComp;
 		bottomComp = param.bottomComp;
 		injRate = param.injRate;
-		okFunc = 'ctrl.modifyWell({id: ' + id + ', newWell: false})';
+		okFunc = 'ctrl.modifyWell({id: ' + id + ', fromDialog: true, newWell: false})';
 		closeFunc = 'ctrl._wells[' + id + '].marker._popup.close()';
 	}
 	else {
@@ -64,7 +64,7 @@ function wellDialogContents(param) {
 		topComp = 0;
 		bottomComp = 0;
 		injRate = 0;
-		okFunc = 'ctrl.modifyWell({id: ' + id + ', newWell: true})';
+		okFunc = 'ctrl.modifyWell({id: ' + id + ', fromDialog: true, newWell: true})';
 		closeFunc = 'newWellDialog.close()';
 	}
 

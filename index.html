@@ -19,8 +19,20 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	
+	<!-- Fonts -->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+	<script src="https://kit.fontawesome.com/bea8d932c9.js" crossorigin="anonymous"></script>
+	
+	<!-- Include jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	
+	<!-- dates_snapshots.js contains the list of dates and solution snapshots -->
+	<script src="./results/dates_snapshots.js"></script>	
+	<!-- latlng_snapshots.js contains the bounding box for the solution snapshots -->	
+	<script src="./results/latlng_snapshots.js"></script>	
+	<!-- results_names.js contains the list of simulation results' variable names and the corresponding folder names -->
+	<script src="./results/results_names.js"></script>	
+	
 	<style>
 
 		/* Change the html body to be a grid with 3 rows */
@@ -182,7 +194,35 @@
 				.openOn(map);
 		}	
 		map.on('click', onLeftClick);	
-		*/		
+		*/	
+
+		// Insert a fixed well in Stenlille at the crossroad Sorøvej and the railway
+		// Completions data are set arbitrary
+		// Injection 1 Mta
+		ctrl.modifyWell({id: 0, fromDialog: false, newWell: true,
+						wellName: 'Stenlille-CO2', 
+						wellLat: 55.538916, 
+						wellLng: 11.599014, 
+						topComp: 1500, 
+						bottomComp: 1550, 
+						injRate: 1,
+		});
+		
+		// Insert a fixed well in Havnsø at the tip of the peninsula
+		// Completions data are set arbitrary
+		// Injection 3 Mta
+		ctrl.modifyWell({id: 1, fromDialog: false, newWell: true,
+						wellName: 'Havnsø-CO2', 
+						wellLat: 55.754763, 
+						wellLng: 11.286269, 
+						topComp: 1500, 
+						bottomComp: 1550, 
+						injRate: 3,
+		});		
+		
+		// Add the simulation control group
+		ctrl.addSimGroup({name: "Simulation"})
+				
 		
 		// A global variable for the New well creation dialog			
 		var newWellDialog; 
