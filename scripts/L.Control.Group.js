@@ -23,8 +23,11 @@ L.Control.Group = L.Control.extend({
 		this._container = L.DomUtil.create('div', this._className);
 		L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');     
 
-		// Disable left-click when on the control
-		L.DomEvent.disableClickPropagation(this._container);		
+		// Disable left-click callback for the map when on the control
+		L.DomEvent.disableClickPropagation(this._container);	
+
+		// Disable map zoom with th emouse wheel when on control
+		L.DomEvent.disableScrollPropagation(this._container);		
 
         return this._container;
     },
