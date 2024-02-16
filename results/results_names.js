@@ -1,1 +1,1 @@
-const resultsNames = [{"name":"CO2 saturation","folder":"sg"},{"name":"Pressure increase","folder":"dp"}]
+const resultsNames = [{"name":"CO<sub>2</sub> saturation","folder":"sg"},{"name":"Pressure increase","folder":"dp"}]
