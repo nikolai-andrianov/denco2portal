@@ -87,12 +87,14 @@
 		}		
 		
 		.collapsible-closed:before {
-		  content: '\2BC8';	/* Left arrow */
+		  /* content: '\2BC8';	Right arrow */
+		  content: '\25B6';
 		  float: left;
 		}
 
 		.collapsible-open:before {
-		  content: '\2BC6';	/* Down arrow */
+		  	/* content: '\2BC6'; Down arrow */
+		  content: '\25BC';
 		  float: left;
 		}
 
@@ -268,7 +270,7 @@
 		ctrl.addToGroup(wellHavnsoe, wells);
 		
 		// Add the simulation control group
-		var sim = ctrl.newCtrlGroup({name: 'Simulation', collapsed: true});
+		var sim = ctrl.newCtrlGroup({name: 'Simulation', collapsed: false});
 		ctrl.addToGroup({type: 'simulation'}, sim);
 		//ctrl.addSimGroup({name: "Simulation"})
 		
