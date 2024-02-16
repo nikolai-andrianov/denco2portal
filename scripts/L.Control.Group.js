@@ -9,6 +9,7 @@ L.Control.Group = L.Control.extend({
         L.Util.setOptions(this, options);
 		this._group = [];
         this._wells = [];
+		this._layers = [];
         this._wellIDcounter = 0;
 		this._activeSimVar = [];		// Array of simulation variables to be plotted 
 		this._selectedTimeInstant = 0;	// Plot solution snapshots at this time instant
@@ -31,59 +32,159 @@ L.Control.Group = L.Control.extend({
 
         return this._container;
     },
-	// Add layers
-	addLayers: function (inputLayers, options) {
-		
-		this._layers = [];
-        for (const i in inputLayers) {
-			this._layers.push({
-				layer: inputLayers[i][0],
-				name: i,
-                checked: inputLayers[i][1],
-			});
-		}
-		
-		// Make sure that the the container is created in onAdd()
-        if (!this._container) {
-            return this;
-        }
-		
+	// Return the handle to a new control group
+	newCtrlGroup: function (options) {
+	
 		// If a group is added to existing group(s), insert a small space to separate them
 		let smallSpace = '';
-		if (this._overlaysList) {
+		if (this._group.length > 0) {
 			smallSpace = '<span style="display: block; margin: 6px 0;"></span>';					
-		}		
-		
-		// Eventually display the group name
-		if (options.name) {
-			const groupName = document.createElement('label');
-			groupName.innerHTML = smallSpace + '<b>' + options.name + '</b>';
-			this._container.appendChild(groupName);
-			
-			console.log(groupName.className);
-		}		
-		
-		// _container contains a set of groups (a label and a form);_form contains _overlaysList, which contains labels of spans, 
-		// where each of spans contains a checkbox and a label
-		this._form = L.DomUtil.create('form', this._className + '-list');
-		this._overlaysList = L.DomUtil.create('div', this._className + '-overlays', this._form);
-		this._container.appendChild(this._form);	
+		}	
 
-		// Layers are controlled by checkbox inputs
-        for (i = 0; i < this._layers.length; i++) {
-			this._addItemCheckBox(i);
-        }
+		let groupName = document.createElement('label');
+		groupName.innerHTML = smallSpace + '<b>' + options.name + '</b>';		
+
+		// A control group is a form with _title and contents
+		let _form = L.DomUtil.create('form', this._className + '-list');
+		
+		// The group title 
+		let _title = L.DomUtil.create('label', 'collapsible-closed', _form);		
+		_title.innerHTML = smallSpace + options.name;
+		
+		// Placeholder for the controls within the group 
+		let contents = L.DomUtil.create('div', 'collapsible-content-closed', _form);
+		contents.collapsed = true;
+		
+		// Eventually open the collapsible contents 
+		if (!options.collapsed) {
+			contents.collapsed = false;
+			_title.classList.remove("collapsible-closed");	
+			_title.classList.add("collapsible-open");	
+			contents.classList.remove("collapsible-content-closed");	
+			contents.classList.add("collapsible-content-open");	
+		}		
+
+		// Expand the control group on click
+		_title.addEventListener("click", function() {
+			//this.classList.toggle("collapsible-open");
+			var content = this.nextElementSibling;
+			if (content.collapsed){
+				//this.classList.toggle("collapsible-open");
+				this.classList.remove("collapsible-closed");	
+				this.classList.add("collapsible-open");		
+				content.classList.remove("collapsible-content-closed");	
+				content.classList.add("collapsible-content-open");								
+				content.style.maxHeight = content.scrollHeight + "px";				
+			} 
+			else {
+				//this.classList.toggle("collapsible-close");
+				this.classList.remove("collapsible-open");	
+				this.classList.add("collapsible-closed");	
+				content.classList.remove("collapsible-content-open");	
+				content.classList.add("collapsible-content-closed");									
+				content.style.maxHeight = '0px';
+			} 	
+			content.collapsed = !content.collapsed;		
+		});
+		
+		// Add the group control to the control pane 
+		this._container.appendChild(_form);	
+		
+		// Keep a reference to the group for eventual updating
+		let newGroup = {
+			name: options.name,
+			contents: contents
+		};		
+		this._group.push(newGroup);
+		
+		return newGroup;
+		
+	},	
+	// Add the input items to the group
+	addToGroup: function (input, group) {
+		
+		if (input.type) {
+			switch (input.type) {
+				case 'checkbox':
+					// A checkbox input toggles input.layer on the map
+					this._addCheckboxControl(input, group);
+					break;
+				case 'well':
+					// Add a new well to the Wells control group
+					this.modifyWell(input);
+					break;		
+				case 'simulation':
+					// Add elements to the Simulation control group
+					this.addSimGroup();
+					break;					
+					
+
+			default:
+				// If no type is provided, interpret input as text 
+				let groupName = document.createElement('label');
+				groupName.innerHTML = '<i>' + input + '</i>';
+				group.contents.appendChild(groupName);	
+			}
+		}
+		else {
+			// If no type is provided, interpret input as text 
+			let groupName = document.createElement('label');
+			groupName.innerHTML = '<i>' + input + '</i>';
+			group.contents.appendChild(groupName);			
+		}
+			
+			
+	},
+	// A checkbox input toggles obj.layer on the map
+	_addCheckboxControl: function (obj, group) {
+		
+		this._layers.push(obj);
+		let i = this._layers.length - 1;
+		
+        const input = document.createElement('input');
+
+		input.type = 'checkbox';
+		input.className = 'leaflet-control-layers-selector';
+		input.defaultChecked = obj.checked;
+		input.layer_id = i;
+				
+		if (obj.checked) {
+			this._map.addLayer(this._layers[i].layer);
+		}
+        
+        input.addEventListener('input', (event) => {
+            const val = event.target.value;
+			const layer = this._layers[input.layer_id].layer;
+			if (this._map.hasLayer(layer)) {
+				this._map.removeLayer(layer);
+			} else {
+				this._map.addLayer(layer);
+			}
+        });
+		
+		const label = document.createElement('label');
+        const span = document.createElement('span');
+		const span_indent = document.createElement('span');
+		span_indent.innerHTML = '';//'&nbsp;&nbsp;';
+		span.appendChild(span_indent);
+		span.appendChild(input);
+		const span_map = document.createElement('span');
+		span_map.innerHTML = ' ' + obj.name;
+        //name.innerHTML = name.innerHTML + ' ' + obj.name;
+		label.appendChild(span);
+		label.appendChild(span_map);
+		group.contents.appendChild(label);		
 		
 	},
     // Add new or edit an existing well 
-	modifyWell: function (options) {
+	modifyWell: function (obj) {
 		
 		let strId, wellName, wellLat, wellLng, topComp, bottomComp, injRate;
 		
 		// If modifyWell is called via a dialog, ...
-        if (options.fromDialog) {
+        if (obj.fromDialog) {
 			// Get well data from the dialog fields
-			strId = '_' + options.id;
+			strId = '_' + obj.id;
 			wellName = document.getElementById('idWellName' + strId);
 			wellLat = document.getElementById('idWellLat' + strId);
 			wellLng = document.getElementById('idWellLng' + strId);
@@ -172,33 +273,35 @@ L.Control.Group = L.Control.extend({
 			
 		}
 		else { // For hardcoded well data, ...
-			// Get well data from the options fields
-			wellName = options.wellName;
-			wellLat = options.wellLat;
-			wellLng = options.wellLng;
-			topComp = options.topComp;
-			bottomComp = options.bottomComp;
-			injRate = options.injRate;    			
+			// Get well data from the obj fields
+			wellName = obj.wellName;
+			wellLat = obj.wellLat;
+			wellLng = obj.wellLng;
+			topComp = obj.topComp;
+			bottomComp = obj.bottomComp;
+			injRate = obj.injRate;    			
 		}
 		
         // If there are no wells yet, add the label for the wells group
+		/*
         if (this._wells.length == 0) {
             const wellsGroupLabel = document.createElement('label');
 			let smallSpace = '<span style="display: block; margin: 6px 0;"></span>';						
             wellsGroupLabel.innerHTML = smallSpace + "<b>Wells</b>";
             this._container.appendChild(wellsGroupLabel);	
         }
+		*/
 		
 		// Round latlng to 5 decimal places, which correspond to the accuracy of 1.11 m
 		wellLat = Math.round(wellLat * 1e5) / 1e5;
 		wellLng = Math.round(wellLng * 1e5) / 1e5;
 		
         // If modifyWell is called via the New well dialog, ...
-        if (options.newWell) {
+        if (obj.newWell) {
 			
             // Add the new well to the Wells control group
 			const span_indent = document.createElement('span');
-			span_indent.innerHTML = '&nbsp;&nbsp;';
+			span_indent.innerHTML = ''; //&nbsp;&nbsp;';
 			
 			const span = document.createElement('span');
 			span.appendChild(span_indent);
@@ -217,13 +320,19 @@ L.Control.Group = L.Control.extend({
 			const wellLabel = document.createElement('label');
 			wellLabel.appendChild(span);
 
-            this._container.appendChild(wellLabel);	
-            
+            // Append the well to the Wells group
+			wells.contents.appendChild(wellLabel);	
+
+			// Adjust the size of the collapsible group contents
+			if (!wells.contents.collapsed) {
+				wells.contents.style.maxHeight = wells.contents.scrollHeight + "px";
+			}
+			
             // Add a draggable well marker on the map
             // Draggable if created from a dialog
             let wellMarker = L.marker([wellLat, wellLng], {
                 id: this._wellIDcounter,
-                draggable: options.fromDialog});
+                draggable: obj.fromDialog});
 
             // Call the well edit dialog when clicked on the well marker
             wellMarker.bindPopup(wellDialogContents({
@@ -261,7 +370,7 @@ L.Control.Group = L.Control.extend({
             this._wells.push(wellData);		
 
             // If well input via a dialog, close the dialog
-            if (options.fromDialog) {
+            if (obj.fromDialog) {
                 newWellDialog.close();
             }
 
@@ -271,7 +380,7 @@ L.Control.Group = L.Control.extend({
         else {
             // ... if modifyWell is called via the Edit well dialog
             // Update the fields of an existing well
-            let id = options.id;
+            let id = obj.id;
             this._wells[id].name = wellName;
             this._wells[id].lat = wellLat,
             this._wells[id].lng = wellLng,
@@ -308,56 +417,8 @@ L.Control.Group = L.Control.extend({
         }
 
 	},	
-	// Create check box for the layer i
-    _addItemCheckBox: function (i) {
-
-		let obj = this._layers[i];
-        const input = document.createElement('input');
-
-		input.type = 'checkbox';
-		input.className = 'leaflet-control-layers-selector';
-		input.defaultChecked = obj.checked;
-		input.layer_id = i;
-				
-		if (obj.checked) {
-			this._map.addLayer(this._layers[i].layer);
-		}
-        
-        input.addEventListener('input', (event) => {
-            const val = event.target.value;
-			const layer = this._layers[input.layer_id].layer;
-			if (this._map.hasLayer(layer)) {
-				this._map.removeLayer(layer);
-			} else {
-				this._map.addLayer(layer);
-			}
-        });
-		
-		const label = document.createElement('label');
-        const span = document.createElement('span');
-		const span_indent = document.createElement('span');
-		span_indent.innerHTML = '&nbsp;&nbsp;';
-		span.appendChild(span_indent);
-		span.appendChild(input);
-		const span_map = document.createElement('span');
-		span_map.innerHTML = ' ' + obj.name;
-        //name.innerHTML = name.innerHTML + ' ' + obj.name;
-		label.appendChild(span);
-		label.appendChild(span_map);
-		this._overlaysList.appendChild(label);
-    },	
 	// Add the simulation control group
 	addSimGroup: function (options) {
-		
-		// If a group is added to existing group(s), insert a small space to separate them
-		let smallSpace = '<span style="display: block; margin: 6px 0;"></span>';							
-		
-		// Eventually display the group name
-		if (options.name) {
-			const groupName = document.createElement('label');
-			groupName.innerHTML = smallSpace + '<b>' + options.name + '</b>';
-			this._container.appendChild(groupName);
-		}	
 		
 		/*
 		// Input the injection period
@@ -377,9 +438,11 @@ L.Control.Group = L.Control.extend({
 		*/
 
 		// Horizontal line
+		/*
 		const horizLine = document.createElement('div');
 		horizLine.innerHTML = smallSpace + '<hr>' + smallSpace; 		
 		this._container.appendChild(horizLine);	
+		*/
 		
 		// Initialize the 2D array for snapshots images
 		// Set up the layers and the plotted (active) simulation variable 
@@ -419,20 +482,23 @@ L.Control.Group = L.Control.extend({
 			const label = document.createElement('label');
 			const span = document.createElement('span');
 			const span_indent = document.createElement('span');
-			span_indent.innerHTML = '&nbsp;&nbsp;';
+			span_indent.innerHTML = '';
 			span.appendChild(span_indent);
 			span.appendChild(input);
 			const span_map = document.createElement('span');
 			span_map.innerHTML = ' ' + resultsNames[i].name;	
 			label.appendChild(span);
 			label.appendChild(span_map);
-			this._overlaysList.appendChild(label);		
+			sim.contents.appendChild(label);		
 	
         }		
 		
-		
-		// Select the available variables
-		
+		// Add small space
+		const smallDiv = document.createElement('div');
+		let smallSpace = '<span style="display: block; margin: 6px 0;"></span>';	
+		smallDiv.innerHTML = smallSpace; 		
+		sim.contents.appendChild(smallDiv);	
+		sim.contents.appendChild(smallDiv);				
 		
 		// Time controls 
 		const spanTimeFirst = document.createElement('span');
@@ -454,12 +520,10 @@ L.Control.Group = L.Control.extend({
 		timeControl.appendChild(spanTimePlayPause);
 		timeControl.appendChild(spanTimeForward);
 		timeControl.appendChild(spanTimeLast);
-		this._container.appendChild(timeControl);
+		sim.contents.appendChild(timeControl);
 		
-		// Add small space
-		const smallDiv = document.createElement('div');
-		smallDiv.innerHTML = smallSpace; 		
-		this._container.appendChild(smallDiv);	
+		// Add small space		
+		sim.contents.appendChild(smallDiv);	
 		
 		//  Menu with available time instants 
 		const menuTime = document.createElement('select');
@@ -487,7 +551,7 @@ L.Control.Group = L.Control.extend({
 		const menuDiv = document.createElement('div');
 		menuDiv.style.textAlign = "center";
 		menuDiv.appendChild(menuTime);
-		this._container.appendChild(menuDiv);
+		sim.contents.appendChild(menuDiv);
 		
 		// If another item is chosen on the menu-time
 		$("#menu-time").change(function() {			

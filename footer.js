@@ -10,7 +10,7 @@ footerDiv.innerHTML = `
 			<center>&copy; CO<sub>2</sub> Portal 2024</center>
 		</div>
 		<div class="col-lg-3">
-			<center>Last updated Feb 11</center>
+			<center>Last updated Feb 16</center>
 		</div>		
 	</div>
 </div>

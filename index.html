@@ -77,6 +77,40 @@
 		  border: 1px solid red;
 		}
 		
+		/* Collapsible controls */
+		.collapsible-closed {
+		  font-weight: bolder;
+		}
+
+		.collapsible-open {
+		  font-weight: bolder;
+		}		
+		
+		.collapsible-closed:before {
+		  content: '\2BC8';	/* Left arrow */
+		  float: left;
+		}
+
+		.collapsible-open:before {
+		  content: '\2BC6';	/* Down arrow */
+		  float: left;
+		}
+
+		.collapsible-content-closed {
+		  margin-left:1em;
+		  max-height: 0;
+		  overflow: hidden;
+		  transition: max-height 0.2s ease-out; /* 0.2s ease-out; /* adds a smooth transition */
+		}	
+		
+		.collapsible-content-open {
+		  margin-left:1em;
+		  /*max-height: fit-content; */
+		  overflow: hidden;
+		  transition: max-height 0.2s ease-out; /* 0.2s ease-out; /* adds a smooth transition */
+		}			
+				
+		
 	</style>
 	
 </head> 
@@ -170,6 +204,7 @@
 		let structuresLayer = L.layerGroup(structures);
 		
 		var checked = true;
+		/*
 		const inputLayers = {
 			"Map": [osmLayer, checked],
 			"Denmark borders": [dkBorderLayer, !checked],			
@@ -177,52 +212,65 @@
 			"Base Gassum": [gassumBaseLayer, !checked],
 			"Structures": [structuresLayer, checked],
 		};
-
-		// Create an empty group control
+		*/
+		
+		const inputLayers = [
+			{name: "Map", layer: osmLayer, type:"checkbox", checked:checked},
+			{name: "Denmark borders", layer: dkBorderLayer, type:"checkbox", checked:!checked},
+			{name: "Top Gassum", layer: gassumTopLayer, type:"checkbox", checked:!checked},
+			{name: "Base Gassum", layer: gassumBaseLayer, type:"checkbox", checked:!checked},
+			{name: "Structures", layer: structuresLayer, type:"checkbox", checked:checked}
+		];
+		
+		// Create an empty control panel
 		var ctrl = L.control.group();
 		ctrl.addTo(map);
 		
-		// Add the input layers to the control pane
-		ctrl.addLayers(inputLayers, {name: "Layers"});
+		// Add an the input layers to the initially empty control group
+		var layers = ctrl.newCtrlGroup({name: "Layers", collapsed: false});
+		
+		// Add input layers to the control group
+		for (let i = 0; i < inputLayers.length; i++) {
+			ctrl.addToGroup(inputLayers[i], layers);		
+		}
 
-		// Add mouse click event listeners
-		/*
-		function onLeftClick(e) {
-			L.popup()
-				.setLatLng(e.latlng)
-				.setContent(`${e.latlng.toString()}`)
-				.openOn(map);
-		}	
-		map.on('click', onLeftClick);	
-		*/	
-
+		// New wells control group
+		var wells = ctrl.newCtrlGroup({name: "Wells", collapsed: true});
+		
 		// Insert a fixed well in Stenlille at the crossroad Sorøvej and the railway
 		// Completions data are set arbitrary
 		// Injection 1 Mta
-		ctrl.modifyWell({id: 0, fromDialog: false, newWell: true,
-						wellName: 'Stenlille-CO2', 
-						wellLat: 55.538916, 
-						wellLng: 11.599014, 
-						topComp: 1500, 
-						bottomComp: 1550, 
-						injRate: 1,
-		});
+		let wellStenlille = {
+			type: 'well',
+			id: 0, fromDialog: false, newWell: true,
+			wellName: 'Stenlille-CO2', 
+			wellLat: 55.538916, 
+			wellLng: 11.599014, 
+			topComp: 1500, 
+			bottomComp: 1550, 
+			injRate: 1,
+		};		
+		ctrl.addToGroup(wellStenlille, wells);
 		
 		// Insert a fixed well in Havnsø at the tip of the peninsula
 		// Completions data are set arbitrary
 		// Injection 3 Mta
-		ctrl.modifyWell({id: 1, fromDialog: false, newWell: true,
-						wellName: 'Havnsø-CO2', 
-						wellLat: 55.754763, 
-						wellLng: 11.286269, 
-						topComp: 1500, 
-						bottomComp: 1550, 
-						injRate: 3,
-		});		
+		let wellHavnsoe = {
+			type: 'well', 
+			id: 1, fromDialog: false, newWell: true,
+			wellName: 'Havnsø-CO2', 
+			wellLat: 55.754763, 
+			wellLng: 11.286269, 
+			topComp: 1500, 
+			bottomComp: 1550, 
+			injRate: 3,	
+		};		
+		ctrl.addToGroup(wellHavnsoe, wells);
 		
 		// Add the simulation control group
-		ctrl.addSimGroup({name: "Simulation"})
-				
+		var sim = ctrl.newCtrlGroup({name: 'Simulation', collapsed: true});
+		ctrl.addToGroup({type: 'simulation'}, sim);
+		//ctrl.addSimGroup({name: "Simulation"})
 		
 		// A global variable for the New well creation dialog			
 		var newWellDialog; 
