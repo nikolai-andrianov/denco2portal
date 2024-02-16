@@ -493,12 +493,11 @@ L.Control.Group = L.Control.extend({
 	
         }		
 		
-		// Add small space
-		const smallDiv = document.createElement('div');
-		let smallSpace = '<span style="display: block; margin: 6px 0;"></span>';	
-		smallDiv.innerHTML = smallSpace; 		
-		sim.contents.appendChild(smallDiv);	
-		sim.contents.appendChild(smallDiv);				
+		// Horizontal line
+		const horizLine = document.createElement('div');
+		let smallSpace = '<span style="display: block; margin: 6px 0;"></span>';		
+		horizLine.innerHTML = '<hr>'; 		
+		sim.contents.appendChild(horizLine);			
 		
 		// Time controls 
 		const spanTimeFirst = document.createElement('span');
@@ -523,7 +522,9 @@ L.Control.Group = L.Control.extend({
 		sim.contents.appendChild(timeControl);
 		
 		// Add small space		
-		sim.contents.appendChild(smallDiv);	
+		const smallDiv = document.createElement('div');
+		smallDiv.innerHTML = smallSpace; 		
+		sim.contents.appendChild(smallDiv);		
 		
 		//  Menu with available time instants 
 		const menuTime = document.createElement('select');
